@@ -22,6 +22,7 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 });
 //signUp
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
+  //stars issue
   const data = new tutorModel({
     email: req.body.email,
     password: req.body.password,
