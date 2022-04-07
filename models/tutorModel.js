@@ -50,8 +50,14 @@ const tutor = new mongoose.Schema({
   },
   //course
   courses: [course],
-  stars: {
+  //check with rating count first before changing
+  rating: {
     type: Number,
+    default: 0
+  },
+  ratingCount:{
+    type: Number,
+    default:0
   },
   hoursTutored: {
     type: Number,

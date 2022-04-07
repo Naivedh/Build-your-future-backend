@@ -20,9 +20,11 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-//signUp
+//signUp 
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
-  //stars issue
+  //unique user needed
+  //stars issue 
+  //courses
   const data = new tutorModel({
     email: req.body.email,
     password: req.body.password,
@@ -33,7 +35,7 @@ tutorRouter.post("/postTutorSignUp", async (req, res) => {
     workingHourStart: req.body.workingHourStart,
     workingHourEnd: req.body.workingHourEnd,
     courses: req.body.courses,
-    stars: req.body.stars,
+    rating: req.body.stars,
     hoursTutored: req.body.hoursTutored,
   });
 
