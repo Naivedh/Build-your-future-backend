@@ -23,8 +23,14 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 //signUp 
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
   //unique user needed
-  //stars issue 
-  //courses
+    const user = await tutorModel.find({ email: req.body.email });
+
+    console.log(user);
+    
+    if (user.length !== 0) {
+      return res.status(500).json({ message: "Email already taken" });
+    }
+
   const data = new tutorModel({
     email: req.body.email,
     password: req.body.password,
