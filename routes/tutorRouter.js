@@ -3,6 +3,8 @@ const tutorModel = require("../models/tutorModel");
 
 const tutorRouter = express.Router();
 
+const generateHash = require("../utils/hashGen");
+
 tutorRouter.get("/tutors", async (req, res) => {
   try {
     const data = await tutorModel.find();
@@ -24,25 +26,14 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
   //unique user needed
     const user = await tutorModel.find({ email: req.body.email });
-
-    console.log(user);
     
     if (user.length !== 0) {
       return res.status(500).json({ message: "Email already taken" });
     }
 
   const data = new tutorModel({
-    email: req.body.email,
-    password: req.body.password,
-    name: req.body.name,
-    about: req.body.about,
-    desc: req.body.desc,
-    imageUrl: req.body.imageUrl,
-    workingHourStart: req.body.workingHourStart,
-    workingHourEnd: req.body.workingHourEnd,
-    courses: req.body.courses,
-    rating: req.body.stars,
-    hoursTutored: req.body.hoursTutored,
+    ...req.body,
+    password: await generateHash(req.body.password),   
   });
 
   try {

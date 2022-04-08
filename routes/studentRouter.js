@@ -3,6 +3,8 @@ const studentModel = require("../models/studentModel");
 
 const studentRouter = express.Router();
 
+const generateHash = require("../utils/hashGen");
+
 //for update user get data
 studentRouter.get("/student/:_id", async (req, res) => {
   try {
@@ -15,9 +17,16 @@ studentRouter.get("/student/:_id", async (req, res) => {
 
 // signup
 studentRouter.post("/postStudentSignUp", async (req, res) => {
+
+  const user = await studentModel.find({ email: req.body.email });
+    
+  if (user.length !== 0) {
+    return res.status(500).json({ message: "Email already taken" });
+  }
+
   const data = new studentModel({
     email: req.body.email,
-    password: req.body.password,
+    password: await generateHash(req.body.password),
     name: req.body.name,
     imageUrl: req.body.imageUrl,
     enrolledCourses: req.body.enrolledCourses,
