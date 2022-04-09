@@ -147,6 +147,17 @@ tutorRouter.put("/updateTutor/updateCourse/:_id", (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-})
+});
+
+
+tutorRouter.delete("/deleteTutor/:_id", (req, res) => {
+  tutorModel.findOneAndDelete(req.params._id, function(err, data){
+    if (err) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.json("User Deleted");
+    }
+  })
+});
 
 module.exports = tutorRouter;
