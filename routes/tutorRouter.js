@@ -149,9 +149,10 @@ tutorRouter.put("/updateTutor/updateCourse/:_id", (req, res) => {
   }
 });
 
-
+//delete
+//issue: deletes whichever does not look for id
 tutorRouter.delete("/deleteTutor/:_id", (req, res) => {
-  tutorModel.findOneAndDelete(req.params._id, function(err, data){
+  tutorModel.findOneAndDelete(req.params._id, function (err, data) {
     if (err) {
       res.status(500).json({ message: error.message });
     } else {

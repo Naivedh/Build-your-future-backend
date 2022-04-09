@@ -51,4 +51,16 @@ appointmentRouter.post("/getAppointments/tutor", async (req, res) => {
     }
   });
 
+//delete (truely delete we need canceled too) => or add here
+//big issue deleted any available appointment
+// appointmentRouter.delete("/deleteAppointment/:_id", (req, res) => {
+//   appointmentModel.findOneAndDelete(req.params._id, function (err, data) {
+//     if (err) {
+//       res.status(500).json({ message: error.message });
+//     } else {
+//       res.json("Appointment Deleted");
+//     }
+//   })
+// });
+
 module.exports = appointmentRouter;
