@@ -25,15 +25,15 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 //signUp 
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
   //unique user needed
-    const user = await tutorModel.find({ email: req.body.email });
-    
-    if (user.length !== 0) {
-      return res.status(500).json({ message: "Email already taken" });
-    }
+  const user = await tutorModel.find({ email: req.body.email });
+
+  if (user.length !== 0) {
+    return res.status(500).json({ message: "Email already taken" });
+  }
 
   const data = new tutorModel({
     ...req.body,
-    password: await generateHash(req.body.password),   
+    password: await generateHash(req.body.password),
   });
 
   try {
@@ -115,8 +115,8 @@ tutorRouter.put("/updateTutor/updateCourse/:_id", (req, res) => {
   try {
     tutorModel.findByIdAndUpdate(
       req.params._id,
-      { $set: {"myArray.$[ele]": req.body} },
-      {arrayFilters: [{ "ele._id": req.body._id }], new: true },
+      { $set: { "myArray.$[ele]": req.body } },
+      { arrayFilters: [{ "ele._id": req.body._id }], new: true },
       function (err, data) {
         if (err) {
           res.status(500).json({ message: error.message });
