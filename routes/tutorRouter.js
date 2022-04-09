@@ -55,7 +55,7 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
     const data = await tutorModel.find({
       email: req.body.email,
     });
-    
+
     if (data.length) {
       const result = await compareHash(req.body.password, data[0].password);
       if (result) {
