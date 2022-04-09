@@ -3,7 +3,7 @@ const studentModel = require("../models/studentModel");
 
 const studentRouter = express.Router();
 
-const generateHash = require("../utils/hashGen");
+const { generateHash, compareHash } = require("../utils/hash");
 
 //for update user get data
 studentRouter.get("/student/:_id", async (req, res) => {

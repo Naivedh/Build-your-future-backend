@@ -3,7 +3,9 @@ const tutorModel = require("../models/tutorModel");
 
 const tutorRouter = express.Router();
 
-const generateHash = require("../utils/hashGen");
+const { generateHash, compareHash } = require("../utils/hash");
+
+const { verfiyToken, generateToken } = require("../utils/token");
 
 tutorRouter.get("/tutors", async (req, res) => {
   try {
@@ -16,12 +18,15 @@ tutorRouter.get("/tutors", async (req, res) => {
 
 tutorRouter.get("/tutor/:_id", async (req, res) => {
   try {
+    const token = req.cookies["session-config"];
+    verfiyToken(token)
     const data = await tutorModel.find({ _id: req.params._id });
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 //signUp 
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
   //unique user needed
@@ -43,16 +48,30 @@ tutorRouter.post("/postTutorSignUp", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
 // signin
 tutorRouter.post("/postTutorSignIn", async (req, res) => {
   try {
     const data = await tutorModel.find({
       email: req.body.email,
-      password: req.body.password,
     });
-    res.json(data);
+    
+    if (data.length) {
+      const result = await compareHash(req.body.password, data[0].password);
+      if (result) {
+        const { _id, email } = data[0];
+        res.cookie("session-config", generateToken({ _id, email }));
+        // res.json(data);
+        res.json("Success");
+      }
+    } else {
+      throw "Password mismatch"
+    }
+
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error)
+    res.status(500).json({ type: 'PASSWORD_MISMATCH', message: error.message });
   }
 });
 
