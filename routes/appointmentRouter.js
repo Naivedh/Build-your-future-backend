@@ -29,35 +29,39 @@ appointmentRouter.get("/appointment/:_id", async (req, res) => {
 
 //getall for a student
 appointmentRouter.post("/getAppointments/student", async (req, res) => {
-    try {
-      const data = await appointmentModel.find({
-          studentId:req.body.studentId
-      });
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+  try {
+    const data = await appointmentModel.find({
+      studentId: req.body.studentId
+    });
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 //getall for a tutor
 appointmentRouter.post("/getAppointments/tutor", async (req, res) => {
-    try {
-      const data = await appointmentModel.find({
-          tutorId:req.body.tutorId
-      });
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+  try {
+    const data = await appointmentModel.find({
+      tutorId: req.body.tutorId
+    });
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 //delete
 appointmentRouter.delete("/deleteAppointment/:_id", (req, res) => {
-  appointmentModel.findOneAndDelete(req.params._id, function (err, data) {
+  appointmentModel.findOneAndDelete({ _id: req.params._id }, function (err, data) {
     if (err) {
-      res.status(500).json({ message: error.message });
-    } else {
+      res.status(500).json({ message: err });
+    }
+    else if(data){
       res.json("Appointment Deleted");
+    }
+    else{
+      res.json("Appointment Not Found");
     }
   })
 });

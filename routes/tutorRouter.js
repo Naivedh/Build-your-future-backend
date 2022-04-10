@@ -151,12 +151,16 @@ tutorRouter.put("/updateTutor/updateCourse/:_id", (req, res) => {
 
 //delete
 tutorRouter.delete("/deleteTutor/:_id", (req, res) => {
-  tutorModel.findOneAndDelete({_id: req.params._id}, function (err, data) {
-    if (data) {
-      res.json("User Deleted");
+  tutorModel.findOneAndDelete({ _id: req.params._id }, function (err, data) {
+    if (err) {
+      res.status(500).json({ message: err });
     }
-    res.status(500).json({ message: "User Not Found" });
-    
+    else if(data){
+      res.json("Tutor Deleted");
+    }
+    else{
+      res.json("User Not Found");
+    }
   })
 });
 
