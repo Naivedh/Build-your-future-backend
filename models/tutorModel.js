@@ -48,7 +48,7 @@ const tutor = new mongoose.Schema({
     required: true,
     type: Number,
   },
-  //course
+  //coursea
   courses: [course],
   //check with rating count first before changing
   rating: {
