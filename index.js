@@ -26,5 +26,5 @@ app.use("/studentapi", studentRouter);
 app.use("/appointmentapi", appointmentRouter);
 
 app.listen(8000, () => {
-  console.log(`Server Started at ${8000}`);
+  console.log(`Server Started at ${3000}`);
 });

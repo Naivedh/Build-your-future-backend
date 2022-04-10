@@ -3,7 +3,7 @@ const appointmentModel = require("../models/appointmentModel");
 
 const appointmentRouter = express.Router();
 
-//postappointment
+//add appointment
 appointmentRouter.post("/postAppointment", async (req, res) => {
   const data = new appointmentModel(req.body);
 

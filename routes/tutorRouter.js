@@ -7,6 +7,7 @@ const { generateHash, compareHash } = require("../utils/hash");
 
 const { verfiyToken, generateToken } = require("../utils/token");
 
+//all Tutors
 tutorRouter.get("/tutors", async (req, res) => {
   try {
     const data = await tutorModel.find();
@@ -16,6 +17,7 @@ tutorRouter.get("/tutors", async (req, res) => {
   }
 });
 
+//one Tutor
 tutorRouter.get("/tutor/:_id", async (req, res) => {
   try {
     const token = req.cookies["session-config"];
@@ -27,7 +29,7 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
   }
 });
 
-//signUp 
+//signUp (add Tutor)
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
   //unique user needed
   const user = await tutorModel.find({ email: req.body.email });
@@ -75,7 +77,7 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
   }
 });
 
-//update profile
+//update Tutor profile
 tutorRouter.put("/updateTutor/:_id", async (req, res) => {
   try {
     tutorModel.findByIdAndUpdate(
