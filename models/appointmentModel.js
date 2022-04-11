@@ -7,6 +7,10 @@ const time = new mongoose.Schema({
     end:{
         required: true,
         type: Number
+    },
+    isActive: {
+      default: true,
+      type: Boolean,
     }
 });
 const appointment = new mongoose.Schema({
@@ -21,10 +25,6 @@ const appointment = new mongoose.Schema({
   studentId: {
     required: true,
     type: String,
-  },
-  isActive: {
-    default: true,
-    type: Boolean,
   },
   timeSlot: [time],
 });

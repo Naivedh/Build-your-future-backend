@@ -19,7 +19,20 @@ appointmentRouter.post("/postAppointment", async (req, res) => {
   }
   else{
     try {
-      
+
+      appointmentModel.findOneAndUpdate(
+        {courseId: req.body.courseId, tutorId:req.body.tutorId, studentId: req.body.studentId},
+        {$push: {timeSlot: req.body.timeSlot}},
+        {new:true, upsert:true},
+        function (err, data) {
+          if (err) {
+            console.log(err);
+            res.status(500).json({ message: err.message });
+          } else {
+            res.json(data);
+          }
+        }
+      )
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
