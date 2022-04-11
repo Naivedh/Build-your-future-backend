@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const tutorRouter = require("./routes/tutorRouter");
 const studentRouter = require("./routes/studentRouter");
 const appointmentRouter = require("./routes/appointmentRouter");
+const commentRouter = require("./routes/commentRouter");
 
 const mongoString = process.env.DATABASE_URL;
 
@@ -24,6 +25,7 @@ app.use(cookieParser())
 app.use("/tutorapi", tutorRouter);
 app.use("/studentapi", studentRouter);
 app.use("/appointmentapi", appointmentRouter);
+app.use("/commentapi", commentRouter);
 
 app.listen(3000, () => {
   console.log(`Server Started at ${3000}`);
