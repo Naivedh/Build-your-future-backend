@@ -1,11 +1,13 @@
 const express = require("express");
 const tutorModel = require("../models/tutorModel");
+const uuid = require('uuid');
 
 const tutorRouter = express.Router();
 
 const { generateHash, compareHash } = require("../utils/hash");
 
 const { verfiyTokenAndExtractInfo, generateToken } = require("../utils/token");
+const feedbackModel = require("../models/feedbackModel");
 
 //all Tutors
 tutorRouter.get("/tutors", async (req, res) => {
@@ -104,14 +106,15 @@ tutorRouter.put("/updateTutor", async (req, res) => {
 //tutor add course (work on multi push same data can bee pushed again)
 // insertion needs to be checked for all array type namespaces
 
-// _id => tutorId
 // import comment schema add blank schema on new course
 tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
-  const _id = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'])
+  const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'])
   const currTutor = await tutorModel.find({
-    _id,
+    _id: tutorId,
   });
 
+  const feedbackId = uuid();
+  const courseId = uuid();
   const hasCourse = currTutor[0].courses.filter((course) => {
     return course.title === req.body.title;
   });
@@ -120,15 +123,17 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
     res.status(500).json({ message: "Course already present" });
   } else {
     try {
+      const newCourse = { ...req.body, feedbackId, _id: courseId };
       tutorModel.findByIdAndUpdate(
-        { _id },
-        { $push: { courses: req.body } },
+        { _id: tutorId },
+        { $push: { courses: newCourse } },
         { new: true, upsert: true },
         function (err, data) {
           if (err) {
             console.log(err);
             res.status(500).json({ message: err.message });
           } else {
+            const feedback = new feedbackModel({ courseId, _id, tutorId, responses: [] });
             res.json(data);
           }
         }
