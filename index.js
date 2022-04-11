@@ -25,6 +25,6 @@ app.use("/tutorapi", tutorRouter);
 app.use("/studentapi", studentRouter);
 app.use("/appointmentapi", appointmentRouter);
 
-app.listen(3000, () => {
-  console.log(`Server Started at ${3000}`);
+app.listen(8000, () => {
+  console.log(`Server Started at ${8000}`);
 });
