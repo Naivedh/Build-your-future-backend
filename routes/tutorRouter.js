@@ -5,7 +5,7 @@ const tutorRouter = express.Router();
 
 const { generateHash, compareHash } = require("../utils/hash");
 
-const { verfiyToken, generateToken } = require("../utils/token");
+const { verfiyTokenAndExtractInfo, generateToken } = require("../utils/token");
 
 //all Tutors
 tutorRouter.get("/tutors", async (req, res) => {
@@ -20,8 +20,8 @@ tutorRouter.get("/tutors", async (req, res) => {
 //one Tutor
 tutorRouter.get("/tutor/:_id", async (req, res) => {
   try {
-    const token = req.cookies["session-config"];
-    verfiyToken(token)
+    const token = req.cookies["byf-session-config"];
+    verfiyTokenAndExtractInfo(token)
     const data = await tutorModel.find({ _id: req.params._id });
     res.json(data);
   } catch (error) {
@@ -62,26 +62,29 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
       const result = await compareHash(req.body.password, data[0].password);
       if (result) {
         const { _id, email } = data[0];
-        res.cookie("session-config", generateToken({ _id, email }));
-        // res.json(data);
+        const cookieData = { _id, email, isTutor: true };
+        res.cookie("byf-session-config", generateToken(cookieData), {
+          expiresIn: new Date(Date.now() + 18000000),
+          maxAge: 18000000 
+        });
         res.json("Success");
       }
     } else {
       throw "Password mismatch"
     }
 
-
   } catch (error) {
     console.log(error)
-    res.status(500).json({ type: 'PASSWORD_MISMATCH', message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 //update Tutor profile
-tutorRouter.put("/updateTutor/:_id", async (req, res) => {
+tutorRouter.put("/updateTutor", async (req, res) => {
   try {
+    const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
     tutorModel.findByIdAndUpdate(
-      req.params._id,
+      tutorId,
       { $set: req.body },
       { new: true },
       function (err, data) {
@@ -99,8 +102,10 @@ tutorRouter.put("/updateTutor/:_id", async (req, res) => {
 
 //tutor add course (work on multi push same data can bee pushed again)
 tutorRouter.put("/updateTutor/addCourse/:_id", async (req, res) => {
+
+  const _id = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'])
   const currTutor = await tutorModel.find({
-    _id: req.params._id,
+    _id,
   });
 
   //return array[]

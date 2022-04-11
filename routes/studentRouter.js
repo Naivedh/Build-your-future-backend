@@ -46,9 +46,21 @@ studentRouter.post("/postStudentSignIn", async (req, res) => {
   try {
     const data = await studentModel.find({
       email: req.body.email,
-      password: req.body.password,
     });
-    res.json(data);
+    if (data.length) {
+      const result = await compareHash(req.body.password, data[0].password);
+      if (result) {
+        const { _id, email } = data[0];
+        const cookieData = { _id, email, isTutor: false };
+        res.cookie("byf-session-config", generateToken(cookieData), {
+          expiresIn: new Date(Date.now() + 18000000),
+          maxAge: 18000000 
+        });
+        res.json("Success");
+      }
+    } else {
+      throw "Password mismatch"
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
