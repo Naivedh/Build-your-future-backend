@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const tutorRouter = require("./routes/tutorRouter");
 const studentRouter = require("./routes/studentRouter");
 const appointmentRouter = require("./routes/appointmentRouter");
-const commentRouter = require("./routes/commentRouter");
+const commentRouter = require("./routes/feedbackRouter");
 
 const mongoString = process.env.DATABASE_URL;
 
