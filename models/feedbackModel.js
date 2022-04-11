@@ -11,7 +11,7 @@ const responses = new mongoose.Schema({
     }
 });
 
-const comments = new mongoose.Schema({
+const feedbacks = new mongoose.Schema({
     courseId:{
         type: String,
         required:true
@@ -23,4 +23,4 @@ const comments = new mongoose.Schema({
     responses: [responses],
 });
 
-module.exports = mongoose.model("comments", comments);
+module.exports = mongoose.model("feedback", feedbacks);
