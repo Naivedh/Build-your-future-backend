@@ -5,14 +5,26 @@ const appointmentRouter = express.Router();
 
 //add appointment (array issue)
 appointmentRouter.post("/postAppointment", async (req, res) => {
-  const data = new appointmentModel(req.body);
 
-  try {
-    const dataToSave = await data.save();
-    res.status(200).json(dataToSave);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+  const data = await appointmentModel.find({courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId})
+
+  if(data.length === 0){
+    const newData = new appointmentModel(req.body);
+    try {
+      const dataToSave = await newData.save();
+      res.status(200).json(dataToSave);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
   }
+  else{
+    try {
+      
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
 });
 
 //get one
