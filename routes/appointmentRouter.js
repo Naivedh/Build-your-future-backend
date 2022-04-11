@@ -3,7 +3,7 @@ const appointmentModel = require("../models/appointmentModel");
 
 const appointmentRouter = express.Router();
 
-//add appointment
+//add appointment (array issue)
 appointmentRouter.post("/postAppointment", async (req, res) => {
   const data = new appointmentModel(req.body);
 
