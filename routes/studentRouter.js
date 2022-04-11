@@ -54,7 +54,8 @@ studentRouter.post("/postStudentSignIn", async (req, res) => {
         const cookieData = { _id, email, isTutor: false };
         res.cookie("byf-session-config", generateToken(cookieData), {
           expiresIn: new Date(Date.now() + 18000000),
-          maxAge: 18000000 
+          maxAge: 18000000,
+          httpOnly: true  
         });
         res.json("Success");
       }

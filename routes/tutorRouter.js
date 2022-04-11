@@ -65,12 +65,13 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
         const cookieData = { _id, email, isTutor: true };
         res.cookie("byf-session-config", generateToken(cookieData), {
           expiresIn: new Date(Date.now() + 18000000),
-          maxAge: 18000000 
+          maxAge: 18000000,
+          httpOnly: true 
         });
         res.json("Success");
       }
     } else {
-      throw "Password mismatch"
+      throw { message: "Password mismatch" }
     }
 
   } catch (error) {
@@ -101,16 +102,17 @@ tutorRouter.put("/updateTutor", async (req, res) => {
 });
 
 //tutor add course (work on multi push same data can bee pushed again)
-tutorRouter.put("/updateTutor/addCourse/:_id", async (req, res) => {
+// insertion needs to be checked for all array type namespaces
 
+// _id => tutorId
+// import comment schema add blank schema on new course
+tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
   const _id = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'])
   const currTutor = await tutorModel.find({
     _id,
   });
 
-  //return array[]
   const hasCourse = currTutor[0].courses.filter((course) => {
-    console.log(course.title === req.body.title)
     return course.title === req.body.title;
   });
 
@@ -119,12 +121,13 @@ tutorRouter.put("/updateTutor/addCourse/:_id", async (req, res) => {
   } else {
     try {
       tutorModel.findByIdAndUpdate(
-        { _id: req.params._id },
+        { _id },
         { $push: { courses: req.body } },
         { new: true, upsert: true },
         function (err, data) {
           if (err) {
-            res.status(500).json({ message: error.message });
+            console.log(err);
+            res.status(500).json({ message: err.message });
           } else {
             res.json(data);
           }
