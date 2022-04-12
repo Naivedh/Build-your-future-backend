@@ -13,7 +13,7 @@ const course = new mongoose.Schema({
   },
   feedback_id: {
     type: String,
-  },
+  }
 });
 
 const tutor = new mongoose.Schema({
