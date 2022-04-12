@@ -11,9 +11,12 @@ const jwt = require("jsonwebtoken")
 const verfiyTokenAndExtractInfo = (token, key = "_id") => {
     try {
         const data = jwt.verify(token, process.env.JWT_KEY);
+        if (key === "*") {
+            return data;
+        }
         return data[key];
     } catch (err) {
-        throw err
+        throw { type: 'SESSION_EXPIRED', message: 'Your session has expired. Please login again' }
     }
 }
 

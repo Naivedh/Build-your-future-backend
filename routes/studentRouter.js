@@ -4,6 +4,7 @@ const studentModel = require("../models/studentModel");
 const studentRouter = express.Router();
 
 const { generateHash, compareHash } = require("../utils/hash");
+const { generateToken } = require("../utils/token");
 
 //for update user get data
 studentRouter.get("/student/:_id", async (req, res) => {
@@ -35,6 +36,7 @@ studentRouter.post("/postStudentSignUp", async (req, res) => {
 
   try {
     const dataToSave = await data.save();
+    dataToSave.password = '';
     res.status(200).json(dataToSave);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -58,9 +60,11 @@ studentRouter.post("/postStudentSignIn", async (req, res) => {
           httpOnly: true  
         });
         res.json("Success");
+      } else {
+        throw { message: "Password mismatch" }
       }
     } else {
-      throw "Password mismatch"
+      throw { message: "User not found" }
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

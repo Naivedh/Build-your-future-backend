@@ -5,7 +5,7 @@ const responses = new mongoose.Schema({
         type: String,
         required:true
     },
-    response:{
+    text:{
         type: String,
         required:true
     }

@@ -47,6 +47,7 @@ tutorRouter.post("/postTutorSignUp", async (req, res) => {
 
   try {
     const dataToSave = await data.save();
+    dataToSave.password = '';
     res.status(200).json(dataToSave);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,9 +72,11 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
           httpOnly: true 
         });
         res.json("Success");
+      } else {
+        throw { message: "Password mismatch" }
       }
     } else {
-      throw { message: "Password mismatch" }
+      throw { message: "User not found" }
     }
 
   } catch (error) {
@@ -83,12 +86,15 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
 });
 
 //update Tutor profile
+
+// ------------------------- Critical: we won't have password while updating the tutor ------------------------ update update query
 tutorRouter.put("/updateTutor", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
+    const tutor = { ...req.body, _id: tutorId }
     tutorModel.findByIdAndUpdate(
       tutorId,
-      { $set: req.body },
+      { $set: tutor },
       { new: true },
       function (err, data) {
         if (err) {
