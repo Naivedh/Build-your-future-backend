@@ -12,6 +12,10 @@ const responses = new mongoose.Schema({
 });
 
 const feedbacks = new mongoose.Schema({
+    _id: {
+        type: String,
+        required: true
+    },
     courseId:{
         type: String,
         required:true

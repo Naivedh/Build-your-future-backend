@@ -1,6 +1,6 @@
 const express = require("express");
 const tutorModel = require("../models/tutorModel");
-const uuid = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 
 const tutorRouter = express.Router();
 
@@ -113,8 +113,8 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
     _id: tutorId,
   });
 
-  const feedbackId = uuid();
-  const courseId = uuid();
+  const feedbackId = uuidv4();
+  const courseId = uuidv4();
   const hasCourse = currTutor[0].courses.filter((course) => {
     return course.title === req.body.title;
   });
@@ -124,16 +124,17 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
   } else {
     try {
       const newCourse = { ...req.body, feedbackId, _id: courseId };
-      tutorModel.findByIdAndUpdate(
+      tutorModel.findByIdAndUpdate( 
         { _id: tutorId },
         { $push: { courses: newCourse } },
         { new: true, upsert: true },
-        function (err, data) {
+        async function (err, data) {
           if (err) {
             console.log(err);
             res.status(500).json({ message: err.message });
           } else {
-            const feedback = new feedbackModel({ courseId, _id, tutorId, responses: [] });
+            const feedback = new feedbackModel({ courseId, _id: feedbackId, tutorId, responses: [] });
+            await feedback.save();
             res.json(data);
           }
         }

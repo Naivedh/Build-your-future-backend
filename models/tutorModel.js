@@ -11,9 +11,14 @@ const course = new mongoose.Schema({
   rating: {
     type: Number,
   },
-  feedback_id: {
+  feedbackId: {
     type: String,
+    required: true
   },
+  _id: {
+    type: String,
+    required: true,
+  }
 });
 
 const tutor = new mongoose.Schema({
