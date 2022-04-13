@@ -110,14 +110,14 @@ tutorRouter.put("/updateTutor", async (req, res) => {
 
 tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
   try {
-  const { tutorId, isTutor } = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], "*"); 
+  const { _id: tutorId, isTutor } = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], "*"); 
   checkUser(isTutor, true);
   const currTutor = await tutorModel.find({
     _id: tutorId,
   });
 
   const feedbackId = uuidv4();
-  const courseId = uuidv4();
+  const courseId = uuidv4();  
   const hasCourse = currTutor[0].courses.filter((course) => {
     return course.title === req.body.title;
   });
