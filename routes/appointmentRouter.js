@@ -7,7 +7,7 @@ const appointmentRouter = express.Router();
 //add appointment (array issue)
 appointmentRouter.post("/postAppointment", async (req, res) => {
   try {
-    const isTutor = verfiyTokenAndExtractInfo(erq.cookies["byf-session-config"], "isTutor");
+    const isTutor = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "isTutor");
     checkUser(isTutor, false);
     const data = await appointmentModel.find({courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId})
     if(data.length === 0){
