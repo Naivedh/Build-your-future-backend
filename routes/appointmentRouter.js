@@ -1,6 +1,5 @@
 const express = require("express");
 const appointmentModel = require("../models/appointmentModel");
-
 const appointmentRouter = express.Router();
 
 //add appointment (array issue)
