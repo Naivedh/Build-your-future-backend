@@ -1,23 +1,25 @@
 const express = require("express");
 const appointmentModel = require("../models/appointmentModel");
+const { checkUser } = require("../utils/checkUser");
+const { verfiyTokenAndExtractInfo } = require("../utils/token");
 const appointmentRouter = express.Router();
 
 //add appointment (array issue)
 appointmentRouter.post("/postAppointment", async (req, res) => {
-
-  const data = await appointmentModel.find({courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId})
-
-  if(data.length === 0){
-    const newData = new appointmentModel(req.body);
-    try {
-      const dataToSave = await newData.save();
-      res.status(200).json(dataToSave);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
+  try {
+    const isTutor = verfiyTokenAndExtractInfo(erq.cookies["byf-session-config"], "isTutor");
+    checkUser(isTutor, false);
+    const data = await appointmentModel.find({courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId})
+    if(data.length === 0){
+      const newData = new appointmentModel(req.body);
+      try {
+        const dataToSave = await newData.save();
+        res.status(200).json(dataToSave);
+      } catch (error) {
+        res.status(400).json({ message: error.message });
+      }
     }
-  }
   else{
-    try {
 
       appointmentModel.findOneAndUpdate(
         {courseId: req.body.courseId, tutorId:req.body.tutorId, studentId: req.body.studentId},
@@ -32,11 +34,11 @@ appointmentRouter.post("/postAppointment", async (req, res) => {
           }
         }
       )
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+    } 
   }
-
+  catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
 //get one

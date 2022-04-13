@@ -9,6 +9,7 @@ const feedbackRouter = express.Router();
 //get all based on courseID (_id == courseId)
 feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
   try {
+    console.log("Inside filter feedbacks");
     const data = await commentModel.find({ courseId: req.params._id });
     res.status(200).json(data);
   } catch (error) {
@@ -19,9 +20,12 @@ feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
 //post one for a courseId 
 feedbackRouter.post("/postFeedback", async (req, res) => {
   try {
-  const { _id, isTutor} = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], '*');
+  const { _id, isTutor} = verfiyTokenAndExtractInfo(req.cookies['catch (error) {
+      res.status(400).json({ message: error.message });
+    }'], '*');
   checkUser(isTutor, false);
-  const feedback = { studentId: _id, ...req.body.text }
+  const feedback = { studentId: _id, ...req.body }
+  console.log(feedback);
   commentModel.findOneAndUpdate(
     { courseId: req.body.courseId },
     { $push: { responses: feedback } },
@@ -40,4 +44,5 @@ feedbackRouter.post("/postFeedback", async (req, res) => {
   }
 });
 
+// update delete 
 module.exports = feedbackRouter;
