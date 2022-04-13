@@ -10,6 +10,7 @@ const { generateToken } = require("../utils/token");
 studentRouter.get("/student/:_id", async (req, res) => {
   try {
     const data = await studentModel.find({ _id: req.params._id });
+    delete data["password"];
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -35,9 +36,8 @@ studentRouter.post("/postStudentSignUp", async (req, res) => {
   });
 
   try {
-    const dataToSave = await data.save();
-    dataToSave.password = '';
-    res.status(200).json(dataToSave);
+    await data.save();
+    res.status(200).json({ message: "Student added" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -59,7 +59,7 @@ studentRouter.post("/postStudentSignIn", async (req, res) => {
           maxAge: 18000000,
           httpOnly: true  
         });
-        res.json("Success");
+        res.json({ message: "Success" });
       } else {
         throw { message: "Password mismatch" }
       }

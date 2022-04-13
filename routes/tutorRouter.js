@@ -8,6 +8,7 @@ const { generateHash, compareHash } = require("../utils/hash");
 
 const { verfiyTokenAndExtractInfo, generateToken } = require("../utils/token");
 const feedbackModel = require("../models/feedbackModel");
+const { checkUser } = require("../utils/checkUser");
 
 //all Tutors
 tutorRouter.get("/tutors", async (req, res) => {
@@ -46,9 +47,8 @@ tutorRouter.post("/postTutorSignUp", async (req, res) => {
   });
 
   try {
-    const dataToSave = await data.save();
-    dataToSave.password = '';
-    res.status(200).json(dataToSave);
+    await data.save();
+    res.status(200).json({ message: "Tutor added" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -71,7 +71,7 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
           maxAge: 18000000,
           httpOnly: true 
         });
-        res.json("Success");
+        res.json({ message: "Success" });
       } else {
         throw { message: "Password mismatch" }
       }
@@ -109,7 +109,9 @@ tutorRouter.put("/updateTutor", async (req, res) => {
 });
 
 tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
-  const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'])
+  try {
+  const { tutorId, isTutor } = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], "*"); 
+  checkUser(isTutor, true);
   const currTutor = await tutorModel.find({
     _id: tutorId,
   });
@@ -123,7 +125,6 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
   if (hasCourse.length !== 0) {
     res.status(500).json({ message: "Course already present" });
   } else {
-    try {
       const newCourse = { ...req.body, feedbackId, _id: courseId };
       tutorModel.findByIdAndUpdate( 
         { _id: tutorId },
@@ -140,11 +141,12 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
           }
         }
       );
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
   }
+} catch (error) {
+  res.status(500).json({ message: error.message });
+}
 });
+
 
 //update course //issue what if we update course name with something else that is already present
 // send full data of a particular course to update the fields from the client side
