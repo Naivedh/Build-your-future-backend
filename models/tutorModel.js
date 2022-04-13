@@ -3,6 +3,7 @@ const course = new mongoose.Schema({
   title: {
     required: true,
     type: String,
+    unique: true,
   },
   description: {
     required: true,
@@ -10,6 +11,7 @@ const course = new mongoose.Schema({
   },
   rating: {
     type: Number,
+    default: 0,
   },
   feedbackId: {
     type: String,
@@ -18,13 +20,18 @@ const course = new mongoose.Schema({
   _id: {
     type: String,
     required: true,
-  }
+  },
+  ratingCount:{
+    type: Number,
+    default:0
+  },
 });
 
 const tutor = new mongoose.Schema({
   email: {
     required: true,
     type: String,
+    unique: true,
   },
   password: {
     required: true,
@@ -59,10 +66,6 @@ const tutor = new mongoose.Schema({
   rating: {
     type: Number,
     default: 0
-  },
-  ratingCount:{
-    type: Number,
-    default:0
   },
   hoursTutored: {
     type: Number,

@@ -9,7 +9,10 @@ const feedbackRouter = require("./routes/feedbackRouter");
 
 const mongoString = process.env.DATABASE_URL;
 
-mongoose.connect(mongoString);
+mongoose.connect(mongoString, { 
+  autoIndex: true,
+});
+
 mongoose.connection.on("error", (error) => {
   console.log(error);
 });

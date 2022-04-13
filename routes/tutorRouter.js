@@ -87,7 +87,6 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
 
 //update Tutor profile
 
-// ------------------------- Critical: we won't have password while updating the tutor ------------------------ update update query
 tutorRouter.put("/updateTutor", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
@@ -109,10 +108,6 @@ tutorRouter.put("/updateTutor", async (req, res) => {
   }
 });
 
-//tutor add course (work on multi push same data can bee pushed again)
-// insertion needs to be checked for all array type namespaces
-
-// import comment schema add blank schema on new course
 tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
   const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'])
   const currTutor = await tutorModel.find({
@@ -152,20 +147,34 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
 });
 
 //update course //issue what if we update course name with something else that is already present
-tutorRouter.put("/updateTutor/updateCourse/:_id", (req, res) => {
+// send full data of a particular course to update the fields from the client side
+
+tutorRouter.put("/updateTutor/updateCourse", async (req, res) => {
   try {
+    const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config']);
+    const currTutor = await tutorModel.find({
+      _id: tutorId,
+    });
+    const hasCourse = currTutor[0].courses.filter((course) => {
+      return course.title === req.body.title && course._id !== req.body._id;
+    });
+    
+    if (hasCourse.length !== 0) {
+      res.status(500).json({ message: "Course already present" });
+    } else {
     tutorModel.findByIdAndUpdate(
-      req.params._id,
-      { $set: { "myArray.$[ele]": req.body } },
-      { arrayFilters: [{ "ele._id": req.body._id }], new: true },
+      tutorId,
+      { $set: { "courses.$[ele]": req.body } },
+      { arrayFilters: [{ "ele._id": req.body._id }], upsert: true, new: true },
       function (err, data) {
         if (err) {
-          res.status(500).json({ message: error.message });
+          res.status(500).json({ message: err.message });
         } else {
           res.json(data);
         }
       }
     );
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
