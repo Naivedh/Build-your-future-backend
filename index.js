@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const tutorRouter = require("./routes/tutorRouter");
 const studentRouter = require("./routes/studentRouter");
@@ -23,6 +24,7 @@ mongoose.connection.once("connected", () => {
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser())
 app.use("/tutorapi", tutorRouter);
