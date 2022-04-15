@@ -160,7 +160,7 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
   const feedbackId = uuidv4();
   const courseId = uuidv4();  
   const hasCourse = currTutor[0].courses.filter((course) => {
-    return course.title === req.body.title;
+    return course.name === req.body.name;
   });
 
   if (hasCourse.length !== 0) {
@@ -199,7 +199,7 @@ tutorRouter.put("/updateTutor/updateCourse", async (req, res) => {
       _id: tutorId,
     });
     const hasCourse = currTutor[0].courses.filter((course) => {
-      return course.title === req.body.title && course._id !== req.body._id;
+      return course.name === req.body.name && course._id !== req.body._id;
     });
     
     if (hasCourse.length !== 0) {
