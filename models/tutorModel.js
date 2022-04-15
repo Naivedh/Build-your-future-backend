@@ -8,6 +8,9 @@ const course = new mongoose.Schema({
     required: true,
     type: String,
   },
+  imageUrl: {
+    type: String,
+  },
   rating: {
     type: Number,
     default: 0,
