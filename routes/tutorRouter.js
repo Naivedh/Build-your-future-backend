@@ -1,6 +1,34 @@
 const express = require("express");
+const axios = require('axios');
 const tutorModel = require("../models/tutorModel");
 const { v4: uuidv4 } = require('uuid');
+
+const multer  = require('multer')
+
+const storage = multer.diskStorage({
+  destination: "images/",
+  filename: (req, file, cb) => {
+    // console.log(req.files);
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  // limits: {
+  //   fileSize: 1024 * 2048,
+  // },
+  // fileFilter: (req, file, cb) => {
+  //   if (
+  //     !["image/jpg", "image/jpeg", "image/png"].filter((imageType) => file.mimetype === imageType)
+  //       .length
+  //   ) {
+  //     cb(new Error("Invalid image type"), false);
+  //   } else {
+  //     cb(null, true);
+  //   }
+  // },
+}).single("file");
 
 const tutorRouter = express.Router();
 
@@ -32,14 +60,27 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
   }
 });
 
+
 //signUp (add Tutor)
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
-  //unique user needed
   const user = await tutorModel.find({ email: req.body.email });
 
   if (user.length !== 0) {
     return res.status(500).json({ message: "Email already taken" });
   }
+
+  upload(req, res, (err) => {
+    if (err) {
+      console.log(err);
+      return res.json({ valid: false, msg: err.message });
+    } else {
+      console.log(req.file);
+    }
+  });
+  // return res.send("Hello");
+  const uploadedImageData = await axios.post(process.env.CLOUD_IMAGE_URL, {
+
+  });
 
   const data = new tutorModel({
     ...req.body,
