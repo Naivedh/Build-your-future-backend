@@ -3,6 +3,8 @@ const express = require("express");
 
 const cloudinary = require("cloudinary").v2;
 
+const streamifier = require('streamifier')
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -14,18 +16,15 @@ const { v4: uuidv4 } = require('uuid');
 
 const multer  = require('multer')
 
-const storage = multer.diskStorage({
-  destination: "images/",
-  filename: (req, file, cb) => {
-    // console.log(req.files);
-    cb(null, file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: "images/",
+//   filename: (req, file, cb) => {
+//     // console.log(req.files);
+//     cb(null, file.originalname);
+//   },
+// });
 
-const upload = multer({
-  storage: storage,
-}).single('image');
-
+const upload = multer();
 
 const tutorRouter = express.Router();
 
@@ -59,42 +58,42 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 
 
 //signUp (add Tutor)
-tutorRouter.post("/postTutorSignUp", async (req, res) => {
-
+tutorRouter.post("/postTutorSignUp", upload.single('image'), async (req, res) => {
+  try {
   const user = await tutorModel.find({ email: req.body.email });
 
   if (user.length !== 0) {
     return res.status(500).json({ message: "Email already taken" });
   }
 
-    // console.log(req.file);
-    upload(req, res, function (err) {
-      if (err) {
-        return res.status(500).json({ msg: "Image upload error" });
-      } else{
-        console.log(req.file);
-        cloudinary.uploader.upload(req.file.path, async (err, imgApiRes) => {
-          if (err) {
-            console.log(err);
-            return res.status(500).json({ msg: "Image upload error" });
-          } else {
-            // console.log(imgApiRes);
-            const data = new tutorModel({
-              ...req.body,
-              imageUrl: imgApiRes.secure_url,
-              password: await generateHash(req.body.password),
-            });
-
-            try {
-              await data.save();
-              res.status(200).json({ message: "Tutor added" });
-            } catch (error) {
-              res.status(500).json({ message: error.message });
+    let streamUpload = (req) => {
+      return new Promise((resolve, reject) => {
+          let stream = cloudinary.uploader.upload_stream(
+            (error, result) => {
+              if (result) {
+                resolve(result);
+              } else {
+                reject(error);
+              }
             }
-          } 
+          );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
       });
-    }
-    });
+    };
+
+    const imageApiRes = await streamUpload(req);
+
+    const data = new tutorModel({
+                ...req.body,
+                imageUrl: imageApiRes.secure_url,
+                password: await generateHash(req.body.password),
+              });
+          await data.save();
+          res.status(200).json({ message: "Tutor added" });
+  } catch (err) {
+        res.status(500).json({ message: err.message });
+  }
 });
 
 // signin
@@ -150,6 +149,9 @@ tutorRouter.put("/updateTutor", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+// add course image upload 
 
 tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
   try {
