@@ -1,5 +1,14 @@
 const express = require("express");
-const axios = require('axios');
+// const axios = require('axios');
+
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+});
+
 const tutorModel = require("../models/tutorModel");
 const { v4: uuidv4 } = require('uuid');
 
@@ -15,20 +24,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  // limits: {
-  //   fileSize: 1024 * 2048,
-  // },
-  // fileFilter: (req, file, cb) => {
-  //   if (
-  //     !["image/jpg", "image/jpeg", "image/png"].filter((imageType) => file.mimetype === imageType)
-  //       .length
-  //   ) {
-  //     cb(new Error("Invalid image type"), false);
-  //   } else {
-  //     cb(null, true);
-  //   }
-  // },
-}).single("file");
+}).single('image');
+
 
 const tutorRouter = express.Router();
 
@@ -63,36 +60,41 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 
 //signUp (add Tutor)
 tutorRouter.post("/postTutorSignUp", async (req, res) => {
+
   const user = await tutorModel.find({ email: req.body.email });
 
   if (user.length !== 0) {
     return res.status(500).json({ message: "Email already taken" });
   }
 
-  upload(req, res, (err) => {
-    if (err) {
-      console.log(err);
-      return res.json({ valid: false, msg: err.message });
-    } else {
-      console.log(req.file);
+    // console.log(req.file);
+    upload(req, res, function (err) {
+      if (err) {
+        return res.status(500).json({ msg: "Image upload error" });
+      } else{
+        console.log(req.file);
+        cloudinary.uploader.upload(req.file.path, async (err, imgApiRes) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({ msg: "Image upload error" });
+          } else {
+            // console.log(imgApiRes);
+            const data = new tutorModel({
+              ...req.body,
+              imageUrl: imgApiRes.secure_url,
+              password: await generateHash(req.body.password),
+            });
+
+            try {
+              await data.save();
+              res.status(200).json({ message: "Tutor added" });
+            } catch (error) {
+              res.status(500).json({ message: error.message });
+            }
+          } 
+      });
     }
-  });
-  // return res.send("Hello");
-  const uploadedImageData = await axios.post(process.env.CLOUD_IMAGE_URL, {
-
-  });
-
-  const data = new tutorModel({
-    ...req.body,
-    password: await generateHash(req.body.password),
-  });
-
-  try {
-    await data.save();
-    res.status(200).json({ message: "Tutor added" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    });
 });
 
 // signin
