@@ -73,4 +73,8 @@ studentRouter.post("/postStudentSignIn", async (req, res) => {
 
 // add enrollment api 
 
+//make course favourite
+
+//add find fovourite
+
 module.exports = studentRouter;
