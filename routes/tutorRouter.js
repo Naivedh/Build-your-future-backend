@@ -33,6 +33,7 @@ const { generateHash, compareHash } = require("../utils/hash");
 const { verfiyTokenAndExtractInfo, generateToken } = require("../utils/token");
 const feedbackModel = require("../models/feedbackModel");
 const { checkUser } = require("../utils/checkUser");
+const studentModel = require("../models/studentModel");
 
 //all Tutors
 tutorRouter.get("/tutors", async (req, res) => {
@@ -60,13 +61,15 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 //signUp (add Tutor)
 tutorRouter.post("/postTutorSignUp", upload.single('image'), async (req, res) => {
   try {
-  const user = await tutorModel.find({ email: req.body.email });
+  const tutor = await tutorModel.find({ email: req.body.email });
 
-  if (user.length !== 0) {
+  const student = await studentModel.find({ email: req.body.email });
+
+  if (tutor.length !== 0 || student.length !== 0) {
     return res.status(500).json({ message: "Email already taken" });
   }
 
-    let streamUpload = (req) => {
+    const streamUpload = (req) => {
       return new Promise((resolve, reject) => {
           let stream = cloudinary.uploader.upload_stream(
             (error, result) => {
