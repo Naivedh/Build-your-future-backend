@@ -131,7 +131,6 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
 });
 
 //update Tutor profile
-
 tutorRouter.put("/updateTutor", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
