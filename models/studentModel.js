@@ -28,6 +28,14 @@ const student = new mongoose.Schema({
     required: true,
     type: String,
   },
+  about: {
+    type: String,
+    default: "",
+  },
+  desc: {
+    type: String,
+    default: "",
+  },
   imageUrl: {
     type: String,
   },

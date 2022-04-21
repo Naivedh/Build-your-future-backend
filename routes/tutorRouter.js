@@ -136,6 +136,9 @@ tutorRouter.put("/updateTutor", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
     const tutor = { ...req.body, _id: tutorId }
+    if (tutor.password) {
+      tutor.password = await req.body.password;
+    }
     tutorModel.findByIdAndUpdate(
       tutorId,
       { $set: tutor },

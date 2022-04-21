@@ -30,12 +30,8 @@ studentRouter.post("/postStudentSignUp", async (req, res) => {
   }
 
   const data = new studentModel({
-    email: req.body.email,
+    ...req.body,
     password: await generateHash(req.body.password),
-    name: req.body.name,
-    imageUrl: req.body.imageUrl,
-    enrolledCourses: req.body.enrolledCourses,
-    hoursStudied: req.body.hoursStudied,
   });
 
   try {
