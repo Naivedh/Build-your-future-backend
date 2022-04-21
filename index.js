@@ -8,6 +8,7 @@ const tutorRouter = require("./routes/tutorRouter");
 const studentRouter = require("./routes/studentRouter");
 const appointmentRouter = require("./routes/appointmentRouter");
 const feedbackRouter = require("./routes/feedbackRouter");
+const loginRouter = require("./routes/loginRouter");
 
 const mongoString = process.env.DATABASE_URL;
 
@@ -28,6 +29,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser())
+app.use("/authapi", loginRouter);
 app.use("/tutorapi", tutorRouter);
 app.use("/studentapi", studentRouter);
 app.use("/appointmentapi", appointmentRouter);

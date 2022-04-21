@@ -1,5 +1,6 @@
 const express = require("express");
 const studentModel = require("../models/studentModel");
+const tutorModel = require("../models/tutorModel");
 
 const studentRouter = express.Router();
 
@@ -20,19 +21,17 @@ studentRouter.get("/student/:_id", async (req, res) => {
 // signup
 studentRouter.post("/postStudentSignUp", async (req, res) => {
 
-  const user = await studentModel.find({ email: req.body.email });
-    
-  if (user.length !== 0) {
+  const tutor = await tutorModel.find({ email: req.body.email });
+
+  const student = await studentModel.find({ email: req.body.email });
+
+  if (tutor.length !== 0 || student.length !== 0) {
     return res.status(500).json({ message: "Email already taken" });
   }
 
   const data = new studentModel({
-    email: req.body.email,
+    ...req.body,
     password: await generateHash(req.body.password),
-    name: req.body.name,
-    imageUrl: req.body.imageUrl,
-    enrolledCourses: req.body.enrolledCourses,
-    hoursStudied: req.body.hoursStudied,
   });
 
   try {
