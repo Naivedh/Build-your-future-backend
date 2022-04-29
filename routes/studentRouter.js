@@ -7,7 +7,7 @@ const studentRouter = express.Router();
 const { generateHash, compareHash } = require("../utils/hash");
 const { verfiyTokenAndExtractInfo, generateToken } = require("../utils/token");
 
-//for update user get data
+//user get data
 studentRouter.get("/student/:_id", async (req, res) => {
   try {
     const data = await studentModel.find({ _id: req.params._id });
@@ -19,7 +19,7 @@ studentRouter.get("/student/:_id", async (req, res) => {
 });
 
 // signup
-studentRouter.post("/postStudentSignUp", async (req, res) => {
+studentRouter.post("/studentSignUp", async (req, res) => {
   const tutor = await tutorModel.find({ email: req.body.email });
 
   const student = await studentModel.find({ email: req.body.email });
@@ -42,7 +42,7 @@ studentRouter.post("/postStudentSignUp", async (req, res) => {
 });
 
 // signin
-studentRouter.post("/postStudentSignIn", async (req, res) => {
+studentRouter.post("/studentSignIn", async (req, res) => {
   try {
     const data = await studentModel.find({
       email: req.body.email,
@@ -69,7 +69,8 @@ studentRouter.post("/postStudentSignIn", async (req, res) => {
   }
 });
 //update student
-studentRouter.put("/updateStudent", async (req, res) => {
+//Put should have/_id url (CHECK)
+studentRouter.put("/student", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
@@ -98,7 +99,7 @@ studentRouter.put("/updateStudent", async (req, res) => {
 
 // add enrollment api
 //tutorId and coursId req.body
-studentRouter.post("/addCourse", async (req, res) => {
+studentRouter.post("/student/course", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
@@ -124,7 +125,7 @@ studentRouter.post("/addCourse", async (req, res) => {
 
 //make course favourite
 //req.body only courseId
-studentRouter.put("/favourite", async (req, res) => {
+studentRouter.put("/student/favourite", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
