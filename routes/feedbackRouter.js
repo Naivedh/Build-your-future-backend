@@ -18,7 +18,7 @@ feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
 });
 
 //post one for a courseId 
-feedbackRouter.post("/postFeedback", async (req, res) => {
+feedbackRouter.post("/feedback", async (req, res) => {
   try {
   const { _id, isTutor} = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], '*');
   checkUser(isTutor, false);
