@@ -123,7 +123,7 @@ studentRouter.post("/studentCourse", async (req, res) => {
   }
 });
 
-//make course favourite
+//make course favourite => requirement must be enrolled
 //req.body only courseId
 studentRouter.put("/studentFavourite", async (req, res) => {
   try {
@@ -136,10 +136,10 @@ studentRouter.put("/studentFavourite", async (req, res) => {
       _id: studentId,
     });
 
-    const course = currStudent[0].enrolledCourses.find((course)=>course.courseId == req.body.courseId);
-    
+    const course = currStudent[0].enrolledCourses.find((course) => course.courseId == req.body.courseId);
+
     course.isFavourite = !course.isFavourite;
-    
+
     studentModel.findByIdAndUpdate(
       studentId,
       { $set: { "enrolledCourses.$[ele]": course } },
@@ -169,7 +169,8 @@ studentRouter.get("/studentFavourite", async (req, res) => {
       _id: studentId,
     });
 
-    console.log(currStudent.enrolledCourses)
+    const favouriteCourses = currStudent[0].enrolledCourses.find((course) => course.isFavourite == true);
+    res.json(favouriteCourses);
 
   } catch (error) {
     res.status(500).json({ message: error.message });
