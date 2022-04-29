@@ -99,7 +99,7 @@ studentRouter.put("/student", async (req, res) => {
 
 // add enrollment api
 //tutorId and coursId req.body
-studentRouter.post("/student/course", async (req, res) => {
+studentRouter.post("/studentCourse", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
@@ -125,7 +125,7 @@ studentRouter.post("/student/course", async (req, res) => {
 
 //make course favourite
 //req.body only courseId
-studentRouter.put("/student/favourite", async (req, res) => {
+studentRouter.put("/studentFavourite", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
@@ -157,6 +157,23 @@ studentRouter.put("/student/favourite", async (req, res) => {
   }
 });
 
-//add find fovourite
+//getfovourite
+studentRouter.get("/studentFavourite", async (req, res) => {
+  try {
+    const studentId = verfiyTokenAndExtractInfo(
+      req.cookies["byf-session-config"],
+      "_id"
+    );
+
+    const currStudent = await studentModel.find({
+      _id: studentId,
+    });
+
+    console.log(currStudent.enrolledCourses)
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = studentRouter;

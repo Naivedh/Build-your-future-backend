@@ -65,7 +65,7 @@ appointmentRouter.post("/appointments/student", async (req, res) => {
 });
 
 //getall for a tutor
-appointmentRouter.post("/getAppointments/tutor", async (req, res) => {
+appointmentRouter.post("/appointments/tutor", async (req, res) => {
   try {
     const data = await appointmentModel.find({
       tutorId: req.body.tutorId

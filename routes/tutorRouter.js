@@ -158,7 +158,7 @@ tutorRouter.put("/tutor", async (req, res) => {
 
 // add course image upload 
 //made put => post check working
-tutorRouter.post("/tutor/course", async (req, res) => {  
+tutorRouter.post("/tutorCourse", async (req, res) => {  
   try {
   const { _id: tutorId, isTutor } = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], "*"); 
   checkUser(isTutor, true);
@@ -201,7 +201,7 @@ tutorRouter.post("/tutor/course", async (req, res) => {
 //update course
 // send full data of a particular course to update the fields from the client side
 
-tutorRouter.put("/tutor/course", async (req, res) => {
+tutorRouter.put("/tutorCourse", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config']);
     const currTutor = await tutorModel.find({
