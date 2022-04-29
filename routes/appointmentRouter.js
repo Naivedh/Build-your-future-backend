@@ -5,7 +5,7 @@ const { verfiyTokenAndExtractInfo } = require("../utils/token");
 const appointmentRouter = express.Router();
 
 //add appointment (array issue)
-appointmentRouter.post("/postAppointment", async (req, res) => {
+appointmentRouter.post("/appointment", async (req, res) => {
   try {
     const isTutor = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "isTutor");
     checkUser(isTutor, false);
@@ -54,7 +54,7 @@ appointmentRouter.get("/appointment/:_id", async (req, res) => {
 });
 
 //getall for a student
-appointmentRouter.post("/getAppointments/student", async (req, res) => {
+appointmentRouter.post("/appointments/student", async (req, res) => {
   try {
     const data = await appointmentModel.find({
       studentId: req.body.studentId
@@ -78,7 +78,7 @@ appointmentRouter.post("/getAppointments/tutor", async (req, res) => {
 });
 
 //delete
-appointmentRouter.delete("/deleteAppointment/:_id", (req, res) => {
+appointmentRouter.delete("/appointment/:_id", (req, res) => {
   appointmentModel.findOneAndDelete({ _id: req.params._id }, function (err, data) {
     if (err) {
       res.status(500).json({ message: err });
