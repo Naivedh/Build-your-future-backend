@@ -7,7 +7,7 @@ const loginRouter = express.Router();
 const { compareHash } = require("../utils/hash");
 const { generateToken } = require("../utils/token");
 
-
+//TODO: ADIT Remove student tutor signin if not required
 loginRouter.post('/login', async (req, res) => {
     try {
         const studentData = await studentModel.find({
