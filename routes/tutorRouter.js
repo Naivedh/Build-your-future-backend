@@ -198,7 +198,7 @@ tutorRouter.post("/tutor/course", async (req, res) => {
 });
 
 
-//update course //issue what if we update course name with something else that is already present
+//update course
 // send full data of a particular course to update the fields from the client side
 
 tutorRouter.put("/tutor/course", async (req, res) => {

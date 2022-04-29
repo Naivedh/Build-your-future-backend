@@ -20,7 +20,6 @@ appointmentRouter.post("/appointment", async (req, res) => {
       }
     }
   else{
-
       appointmentModel.findOneAndUpdate(
         {courseId: req.body.courseId, tutorId:req.body.tutorId, studentId: req.body.studentId},
         {$push: {timeSlot: req.body.timeSlot}},
