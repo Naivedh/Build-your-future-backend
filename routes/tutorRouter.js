@@ -59,7 +59,7 @@ tutorRouter.get("/tutor/:_id", async (req, res) => {
 
 
 //signUp (add Tutor)
-tutorRouter.post("/postTutorSignUp", upload.single('image'), async (req, res) => {
+tutorRouter.post("/tutorSignUp", upload.single('image'), async (req, res) => {
   try {
   const tutor = await tutorModel.find({ email: req.body.email });
 
@@ -100,7 +100,7 @@ tutorRouter.post("/postTutorSignUp", upload.single('image'), async (req, res) =>
 });
 
 // signin
-tutorRouter.post("/postTutorSignIn", async (req, res) => {
+tutorRouter.post("/tutorSignIn", async (req, res) => {
   try {
     const data = await tutorModel.find({
       email: req.body.email,
@@ -131,7 +131,7 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
 });
 
 //update Tutor profile
-tutorRouter.put("/updateTutor", async (req, res) => {
+tutorRouter.put("/tutor", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
     const tutor = { ...req.body, _id: tutorId }
@@ -157,8 +157,8 @@ tutorRouter.put("/updateTutor", async (req, res) => {
 
 
 // add course image upload 
-
-tutorRouter.put("/updateTutor/addCourse", async (req, res) => {  
+//made put => post check working
+tutorRouter.post("/tutor/course", async (req, res) => {  
   try {
   const { _id: tutorId, isTutor } = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], "*"); 
   checkUser(isTutor, true);
@@ -201,7 +201,7 @@ tutorRouter.put("/updateTutor/addCourse", async (req, res) => {
 //update course //issue what if we update course name with something else that is already present
 // send full data of a particular course to update the fields from the client side
 
-tutorRouter.put("/updateTutor/updateCourse", async (req, res) => {
+tutorRouter.put("/tutor/course", async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config']);
     const currTutor = await tutorModel.find({
@@ -233,7 +233,7 @@ tutorRouter.put("/updateTutor/updateCourse", async (req, res) => {
 });
 
 //delete
-tutorRouter.delete("/deleteTutor/:_id", (req, res) => {
+tutorRouter.delete("/tutor/:_id", (req, res) => {
   tutorModel.findOneAndDelete({ _id: req.params._id }, function (err, data) {
     if (err) {
       res.status(500).json({ message: err });
