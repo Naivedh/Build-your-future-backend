@@ -69,7 +69,6 @@ studentRouter.post("/studentSignIn", async (req, res) => {
   }
 });
 //update student
-//Put should have/_id url (CHECK)
 studentRouter.put("/student", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
@@ -77,12 +76,13 @@ studentRouter.put("/student", async (req, res) => {
       "_id"
     );
     const student = { ...req.body, _id: studentId };
+    console.log(studentId)
     if (student.password) {
       student.password = await req.body.password;
     }
     studentModel.findByIdAndUpdate(
       studentId,
-      { $set: tutor },
+      { $set: student },
       { new: true },
       function (err, data) {
         if (err) {
@@ -97,7 +97,7 @@ studentRouter.put("/student", async (req, res) => {
   }
 });
 
-// add enrollment api
+//Enroll
 //tutorId and coursId req.body
 studentRouter.post("/studentCourse", async (req, res) => {
   try {
