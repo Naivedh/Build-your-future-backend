@@ -68,6 +68,7 @@ studentRouter.post("/studentSignIn", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 //update student
 studentRouter.put("/student", async (req, res) => {
   try {
@@ -76,7 +77,7 @@ studentRouter.put("/student", async (req, res) => {
       "_id"
     );
     const student = { ...req.body, _id: studentId };
-    console.log(studentId)
+    
     if (student.password) {
       student.password = await req.body.password;
     }
@@ -168,8 +169,8 @@ studentRouter.get("/studentFavourite", async (req, res) => {
     const currStudent = await studentModel.find({
       _id: studentId,
     });
-
-    const favouriteCourses = currStudent[0].enrolledCourses.find((course) => course.isFavourite == true);
+   
+    const favouriteCourses = currStudent[0].enrolledCourses.filter((course) => course.isFavourite == true);
     res.json(favouriteCourses);
 
   } catch (error) {
