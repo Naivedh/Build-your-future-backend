@@ -95,6 +95,7 @@ tutorRouter.post("/tutorSignUp", upload.single('image'), async (req, res) => {
           await data.save();
           res.status(200).json({ message: "Tutor added" });
   } catch (err) {
+        console.log(err);
         res.status(500).json({ message: err.message });
   }
 });

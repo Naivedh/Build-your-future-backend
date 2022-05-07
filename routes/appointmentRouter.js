@@ -7,63 +7,68 @@ const appointmentRouter = express.Router();
 
 //add appointment (array issue)
 // TODO: check if time in timeslot and not clashing with other
+//cannot send everything get coursename student name tutorname
 appointmentRouter.post("/appointment", async (req, res) => {
   try {
     const isTutor = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "isTutor");
     checkUser(isTutor, false);
 
-    reqHoursStart = req.body.timeSlot.start.getHours();
-    reqHourEnd = req.body.timeSlot.end.getHours();
-    reqMinuteStart = req.body.timeSlot.start.getMinutes();
-    reqMinuteEnd = req.body.timeSlot.end.getMinutes();
+    reqHoursStart = new Date(req.body.timeSlot.start).getHours();
+    reqHourEnd = new Date(req.body.timeSlot.end).getHours();
+    reqMinuteStart = new Date(req.body.timeSlot.start).getMinutes();
+    reqMinuteEnd = new Date(req.body.timeSlot.end).getMinutes();
 
     // within working hours
-    const { workingHourStart, workingHourEnd } = await tutorModel.find({ tutorId: req.body.tutorId });
-    if (reqHoursStart< workingHourStart.getHours() && reqMinuteStart < workingHourStart.getMinutes() && reqHourEnd > workingHourEnd.getHours() && req.reqMinuteEnd > workingHourEnd.getMinutes()) {
-      res.status(400).json({ message: "Please select time within working Hours" });
-    }
+    // const { workingHourStart, workingHourEnd } = await tutorModel.find({ tutorId: req.body.tutorId });
+    // workingHourStart = new Date(workingHourStart)
+    // workingHourEnd = new Date(workingHourEnd)
+    // if () {
+    //   res.status(400).json({ message: "Please select time within working Hours" });
+    // }
 
-    const tutorAppointmentData = await appointmentModel.find({ tutorId: req.body.tutorId })
+    // const tutorAppointmentData = await appointmentModel.find({ tutorId: req.body.tutorId })
 
-    tutorAppointmentData.map((specific) => {
-      specific.timeSlot.map((oneAppointment) => {
-        if ((oneAppointment.start.getHours() > reqHourEnd && oneAppointment.start.getMinutes() > reqMinuteEnd) || (oneAppointment.end.getHours()<reqHoursStart && oneAppointment.end.getMinutes()<reqMinuteStart)){
-        res.status(400).json({ message: "Please select some other timeslot" });
-      }
-    })
-  })
+    // tutorAppointmentData.map((specific) => {
+    //   specific.timeSlot.map((oneAppointment) => {
+    //     if (
+          
+    //     ) {
+    //       res.status(400).json({ message: "Please select some other timeslot" });
+    //     }
+    //   })
+    // })
 
 
-const data = await appointmentModel.find({ courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId })
+    const data = await appointmentModel.find({ courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId })
 
-if (data.length === 0) {
-  const newData = new appointmentModel(req.body);
-  try {
-    const dataToSave = await newData.save();
-    res.status(200).json(dataToSave);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-}
-else {
-  appointmentModel.findOneAndUpdate(
-    { courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId },
-    { $push: { timeSlot: req.body.timeSlot } },
-    { new: true, upsert: true },
-    function (err, data) {
-      if (err) {
-        console.log(err);
-        res.status(500).json({ message: err.message });
-      } else {
-        res.json(data);
+    if (data.length === 0) {
+      const newData = new appointmentModel(req.body);
+      try {
+        const dataToSave = await newData.save();
+        res.status(200).json(dataToSave);
+      } catch (error) {
+        res.status(400).json({ message: error.message });
       }
     }
-  )
-} 
+    else {
+      appointmentModel.findOneAndUpdate(
+        { courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId },
+        { $push: { timeSlot: req.body.timeSlot } },
+        { new: true, upsert: true },
+        function (err, data) {
+          if (err) {
+            console.log(err);
+            res.status(500).json({ message: err.message });
+          } else {
+            res.json(data);
+          }
+        }
+      )
+    }
   }
   catch (error) {
-  res.status(400).json({ message: error.message });
-}
+    res.status(400).json({ message: error.message });
+  }
 });
 
 //get one

@@ -2,11 +2,15 @@ const mongoose = require("mongoose");
 const time = new mongoose.Schema({
     start:{
         required: true,
-        type: Number
+        type: Number,
+        min:000000000000000,
+        max:999999999999999
     },
     end:{
         required: true,
-        type: Number
+        type: Number,
+        min:000000000000000,
+        max:999999999999999
     },
     isActive: {
       default: true,

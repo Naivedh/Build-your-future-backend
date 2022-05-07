@@ -7,6 +7,7 @@ const course = new mongoose.Schema({
   description: {
     required: true,
     type: String,
+    default:""
   },
   imageUrl: {
     type: String,
@@ -56,10 +57,14 @@ const tutor = new mongoose.Schema({
   workingHourStart: {
     required: true,
     type: Number,
+    min:000000000000000,
+    max:999999999999999
   },
   workingHourEnd: {
     required: true,
     type: Number,
+    min:000000000000000,
+    max:999999999999999
   },
   //coursea
   courses: [course],
