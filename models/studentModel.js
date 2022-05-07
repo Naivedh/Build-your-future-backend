@@ -2,12 +2,15 @@ const mongoose = require("mongoose");
 const course = new mongoose.Schema({
   tutorId: {
     type: String,
+    required:true
   },
   courseId: {
     type: String,
+    required: true
   },
   courseRating: {
     type: Number,
+    default:0,
   },
   isFavourite: {
     type: Boolean,

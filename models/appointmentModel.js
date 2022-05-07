@@ -18,13 +18,25 @@ const appointment = new mongoose.Schema({
     required: true,
     type: String,
   },
+  courseName:{
+    required:true,
+    type: String
+  },
   tutorId: {
     required: true,
     type: String,
   },
+  tutorName:{
+    required:true,
+    type: String
+  },
   studentId: {
     required: true,
     type: String,
+  },
+  studentName:{
+    required:true,
+    type: String
   },
   timeSlot: [time],
 });
