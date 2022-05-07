@@ -114,7 +114,7 @@ tutorRouter.post("/postTutorSignIn", async (req, res) => {
         res.cookie("byf-session-config", generateToken(cookieData), {
           expiresIn: new Date(Date.now() + 18000000),
           maxAge: 18000000,
-          httpOnly: true 
+          // httpOnly: true 
         });
         res.json({ message: "Success" });
       } else {
@@ -137,7 +137,7 @@ tutorRouter.put("/updateTutor", async (req, res) => {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
     const tutor = { ...req.body, _id: tutorId }
     if (tutor.password) {
-      tutor.password = await req.body.password;
+      tutor.password = await generateHash(req.body.password);
     }
     tutorModel.findByIdAndUpdate(
       tutorId,
