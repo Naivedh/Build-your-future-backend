@@ -6,9 +6,18 @@ const tutorModel = require("../models/tutorModel");
 const loginRouter = express.Router();
 
 const { compareHash } = require("../utils/hash");
-const { generateToken } = require("../utils/token");
+const { generateToken, verfiyTokenAndExtractInfo } = require("../utils/token");
 
-//TODO: ADIT Remove student tutor signin if not required
+loginRouter.post('/check', async (req, res) => {
+  try {
+    const cookieData = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "*")
+    res.json(cookieData);
+  } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error.message });
+  }
+});
+
 loginRouter.post('/login', async (req, res) => {
     try {
         const studentData = await studentModel.find({
@@ -31,7 +40,7 @@ loginRouter.post('/login', async (req, res) => {
             res.cookie("byf-session-config", generateToken(cookieData), {
               expiresIn: new Date(Date.now() + 18000000),
               maxAge: 18000000,
-              // httpOnly: true  
+              httpOnly: true  
             });
             const responseData = { message: "Success", isTutor };
             if (isTutor) {
