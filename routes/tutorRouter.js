@@ -99,37 +99,6 @@ tutorRouter.post("/tutorSignUp", upload.single('image'), async (req, res) => {
   }
 });
 
-// signin
-tutorRouter.post("/tutorSignIn", async (req, res) => {
-  try {
-    const data = await tutorModel.find({
-      email: req.body.email,
-    });
-
-    if (data.length) {
-      const result = await compareHash(req.body.password, data[0].password);
-      if (result) {
-        const { _id, email } = data[0];
-        const cookieData = { _id, email, isTutor: true };
-        res.cookie("byf-session-config", generateToken(cookieData), {
-          expiresIn: new Date(Date.now() + 18000000),
-          maxAge: 18000000,
-          // httpOnly: true 
-        });
-        res.json({ message: "Success" });
-      } else {
-        throw { message: "Password mismatch" }
-      }
-    } else {
-      throw { message: "User not found" }
-    }
-
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: error.message });
-  }
-});
-
 //update Tutor profile
 tutorRouter.put("/tutor", async (req, res) => {
   try {

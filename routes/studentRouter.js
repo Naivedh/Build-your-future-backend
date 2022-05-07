@@ -41,33 +41,6 @@ studentRouter.post("/studentSignUp", async (req, res) => {
   }
 });
 
-// signin
-studentRouter.post("/studentSignIn", async (req, res) => {
-  try {
-    const data = await studentModel.find({
-      email: req.body.email,
-    });
-    if (data.length) {
-      const result = await compareHash(req.body.password, data[0].password);
-      if (result) {
-        const { _id, email } = data[0];
-        const cookieData = { _id, email, isTutor: false };
-        res.cookie("byf-session-config", generateToken(cookieData), {
-          expiresIn: new Date(Date.now() + 18000000),
-          maxAge: 18000000,
-          httpOnly: true,
-        });
-        res.json({ message: "Success" });
-      } else {
-        throw { message: "Password mismatch" };
-      }
-    } else {
-      throw { message: "User not found" };
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 //update student
 studentRouter.put("/student", async (req, res) => {
