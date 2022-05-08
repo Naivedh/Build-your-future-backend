@@ -8,6 +8,17 @@ const loginRouter = express.Router();
 const { compareHash } = require("../utils/hash");
 const { generateToken, verfiyTokenAndExtractInfo } = require("../utils/token");
 
+
+loginRouter.get('/logout', async (req, res) => {
+  try {
+    res.clearCookie('byf-session-config');
+    res.end();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 loginRouter.post('/check', async (req, res) => {
   try {
     const cookieData = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "*")
