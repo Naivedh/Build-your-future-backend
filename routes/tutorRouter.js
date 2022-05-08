@@ -133,15 +133,14 @@ tutorRouter.put("/tutor", async (req, res) => {
 });
 
 //get course by id
-tutorRouter.get("/course/:_id", async (req, res) => {
+// how to get data
+
+tutorRouter.get("/course/:tutorId&:courseId", async (req, res) => {
   try {
-    //token required???
-    const token = req.cookies["byf-session-config"];
-    const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
-    const tutorData = await tutorModel.find({ _id: tutorId });
-    data = tutorData[0].courses.find((course)=>course._id === req.params._id)
-    console.log(data)
+    const tutorData = await tutorModel.find({ tutorId });
+    data = tutorData[0].courses.find((course)=>course._id == req.params.courseId)
     res.json(data);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -193,8 +192,6 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
             console.log(err);
             res.status(500).json({ message: err.message });
           } else {
-            // const feedback = new feedbackModel({ courseId, _id: feedbackId, tutorId, responses: [] });
-            // await feedback.save();
             res.json(data);
           }
         }

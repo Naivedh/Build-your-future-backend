@@ -5,6 +5,14 @@ const responses = new mongoose.Schema({
         type: String,
         required:true
     },
+    studentName:{
+        type: String,
+        required:true
+    },
+    imageUrl:{
+        type: String,
+        required:true
+    },
     text:{
         type: String,
         required:true

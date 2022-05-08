@@ -11,11 +11,7 @@ const course = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-  },
-  _id: {
-    type: String,
-    required: true,
-  },
+  }
 });
 
 const tutor = new mongoose.Schema({
