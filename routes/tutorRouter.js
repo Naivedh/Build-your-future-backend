@@ -134,7 +134,8 @@ tutorRouter.put("/tutor", async (req, res) => {
 
 //get course by id
 // how to get data
-
+//unique name no work
+//give msg without image
 tutorRouter.get("/course/:tutorId&:courseId", async (req, res) => {
   try {
     const tutorData = await tutorModel.find({ tutorId });

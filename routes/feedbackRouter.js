@@ -11,6 +11,7 @@ const feedbackRouter = express.Router();
 feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
   try {
     const data = await commentModel.find({ tutorId: req.params._id });
+    console.log(data)
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -18,11 +19,22 @@ feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
 });
 
 //post one for tutorid
+//ome student one feedback baki
 feedbackRouter.post("/feedback", async (req, res) => {
   try {
   const { _id, isTutor} = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], '*');
   checkUser(isTutor, false);
-  const student = await studentModel.find({ studentId: _id });
+  const student = await studentModel.find({ _id });
+
+  const tutorFeedback = await commentModel.find({ tutorId: req.body.tutorId  });
+  const data = tutorFeedback[0].responses.find((student)=>student.studentId === _id);
+  if(data){
+    return res.status(500).json({ message: "Feedback already Present"})
+  }
+  if(!req.body.text.length){
+    return res.status(500).json({ message: "Feeback cannot be Empty"})
+  }
+
   const feedback = { studentId: _id, text:req.body.text, studentName:student[0].name, imageUrl:student[0].imageUrl }
   commentModel.findOneAndUpdate(
     { tutorId: req.body.tutorId },

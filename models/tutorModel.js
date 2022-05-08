@@ -15,6 +15,10 @@ const course = new mongoose.Schema({
 });
 
 const tutor = new mongoose.Schema({
+  _id:{
+    required: true,
+    type:String
+  },
   email: {
     required: true,
     type: String,
