@@ -8,6 +8,14 @@ const course = new mongoose.Schema({
     type: String,
     required: true
   },
+  courseName:{
+    type:String,
+    required:true
+  },
+  courseImageUrl:{
+    type:String,
+    required:true
+  },
   courseRating: {
     type: Number,
     default:0,

@@ -154,10 +154,7 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
   checkUser(isTutor, true);
   const currTutor = await tutorModel.find({
     _id: tutorId,
-  });
-
-  // const feedbackId = uuidv4();
-  // const courseId = uuidv4();  
+  }); 
   const hasCourse = currTutor[0].courses.filter((course) => {
     return course.name === req.body.name;
   });
@@ -206,23 +203,35 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
 
 //update course
 // send full data of a particular course to update the fields from the client side
-
-tutorRouter.put("/tutorCourse", async (req, res) => {
+tutorRouter.put("/tutorCourse", upload.single('image'), async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config']);
     const currTutor = await tutorModel.find({
       _id: tutorId,
     });
-    const hasCourse = currTutor[0].courses.filter((course) => {
-      return course.name === req.body.name && course._id !== req.body._id;
-    });
     
-    if (hasCourse.length !== 0) {
-      res.status(500).json({ message: "Course already present" });
-    } else {
+    const streamUpload = (req) => {
+      return new Promise((resolve, reject) => {
+          let stream = cloudinary.uploader.upload_stream(
+            (error, result) => {
+              if (result) {
+                resolve(result);
+              } else {
+                reject(error);
+              }
+            }
+          );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+    const imageApiRes = await streamUpload(req);
+    const newCourse = { ...req.body, imageUrl: imageApiRes.secure_url};
+
+   
     tutorModel.findByIdAndUpdate(
       tutorId,
-      { $set: { "courses.$[ele]": req.body } },
+      { $set: { "courses.$[ele]": newCourse } },
       { arrayFilters: [{ "ele._id": req.body._id }], upsert: true, new: true },
       function (err, data) {
         if (err) {
@@ -232,13 +241,14 @@ tutorRouter.put("/tutorCourse", async (req, res) => {
         }
       }
     );
-    }
+    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 //delete
+// you need to delete multiple places
 tutorRouter.delete("/tutor/:_id", (req, res) => {
   tutorModel.findOneAndDelete({ _id: req.params._id }, function (err, data) {
     if (err) {

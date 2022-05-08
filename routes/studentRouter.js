@@ -104,7 +104,7 @@ studentRouter.put("/student", async (req, res) => {
 });
 
 //Enroll
-//tutorId and coursId req.body
+//tutorId and coursId coursename course imageurl
 studentRouter.post("/studentCourse", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
@@ -131,7 +131,7 @@ studentRouter.post("/studentCourse", async (req, res) => {
 
 //make course favourite => requirement must be enrolled
 //req.body only courseId
-studentRouter.put("/studentFavourite", async (req, res) => {
+studentRouter.post("/studentFavourite", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
@@ -176,6 +176,7 @@ studentRouter.get("/studentFavourite", async (req, res) => {
     });
    
     const favouriteCourses = currStudent[0].enrolledCourses.filter((course) => course.isFavourite == true);
+
     res.json(favouriteCourses);
 
   } catch (error) {
