@@ -125,10 +125,22 @@ tutorRouter.put("/tutor", async (req, res) => {
   }
 });
 
+//get course by id
+tutorRouter.get("/course/:_id", async (req, res) => {
+  try {
+    //token required???
+    const token = req.cookies["byf-session-config"];
+    const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
+    const tutorData = await tutorModel.find({ _id: tutorId });
+    data = tutorData[0].courses.find((course)=>course._id === req.params._id)
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// add course image upload 
-//made put => post check working
-tutorRouter.post("/tutorCourse", async (req, res) => {  
+// add course 
+tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {  
   try {
   const { _id: tutorId, isTutor } = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], "*"); 
   checkUser(isTutor, true);
@@ -145,7 +157,25 @@ tutorRouter.post("/tutorCourse", async (req, res) => {
   if (hasCourse.length !== 0) {
     res.status(500).json({ message: "Course already present" });
   } else {
-      const newCourse = { ...req.body, feedbackId, _id: courseId };
+    
+      const streamUpload = (req) => {
+        return new Promise((resolve, reject) => {
+            let stream = cloudinary.uploader.upload_stream(
+              (error, result) => {
+                if (result) {
+                  resolve(result);
+                } else {
+                  reject(error);
+                }
+              }
+            );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+      const imageApiRes = await streamUpload(req);
+
+      const newCourse = { ...req.body, feedbackId, _id: courseId , imageUrl: imageApiRes.secure_url};
       tutorModel.findByIdAndUpdate( 
         { _id: tutorId },
         { $push: { courses: newCourse } },

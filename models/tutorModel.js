@@ -4,7 +4,7 @@ const course = new mongoose.Schema({
     required: true,
     type: String,
   },
-  description: {
+  desc: {
     required: true,
     type: String,
     default:""
