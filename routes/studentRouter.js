@@ -141,9 +141,9 @@ studentRouter.post("/studentFavourite", async (req, res) => {
     const currStudent = await studentModel.find({
       _id: studentId,
     });
-
+    
     const course = currStudent[0].enrolledCourses.find((course) => course.courseId == req.body.courseId);
-
+   
     course.isFavourite = !course.isFavourite;
 
     studentModel.findByIdAndUpdate(
@@ -154,7 +154,8 @@ studentRouter.post("/studentFavourite", async (req, res) => {
         if (err) {
           res.status(500).json({ message: err.message });
         } else {
-          res.json(data);
+          const newData = data.enrolledCourses.filter((course)=>course.isFavourite===true)
+          res.json(newData);
         }
       }
     );
