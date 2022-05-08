@@ -16,10 +16,6 @@ const feedbacks = new mongoose.Schema({
         type: String,
         required: true
     },
-    courseId:{
-        type: String,
-        required:true
-    },
     tutorId:{
         type: String,
         required:true

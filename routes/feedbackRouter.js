@@ -6,7 +6,7 @@ const { verfiyTokenAndExtractInfo } = require("../utils/token");
 
 const feedbackRouter = express.Router();
 
-//get all based on courseID (_id == courseId)
+//get all based on courseID (_id == courseId) change to tutor id add image of student with name
 feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
   try {
     console.log("Inside filter feedbacks");
@@ -17,7 +17,7 @@ feedbackRouter.get("/feedbacks/:_id", async (req, res) => {
   }
 });
 
-//post one for a courseId 
+//post one for a courseId  change to tutorid
 feedbackRouter.post("/feedback", async (req, res) => {
   try {
   const { _id, isTutor} = verfiyTokenAndExtractInfo(req.cookies['byf-session-config'], '*');

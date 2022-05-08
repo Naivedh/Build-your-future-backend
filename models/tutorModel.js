@@ -12,18 +12,6 @@ const course = new mongoose.Schema({
   imageUrl: {
     type: String,
   },
-  rating: {
-    type: Number,
-    default: 0,
-  },
-  ratingCount:{
-    type: Number,
-    default:0
-  },
-  feedbackId: {
-    type: String,
-    required: true
-  },
   _id: {
     type: String,
     required: true,
@@ -71,12 +59,20 @@ const tutor = new mongoose.Schema({
   //check with rating count first before changing
   rating: {
     type: Number,
-    default: 0
+    default: 0,
+  },
+  ratingCount:{
+    type: Number,
+    default:0
   },
   hoursTutored: {
     type: Number,
     default: 0,
   },
+  feedbackId: {
+    type: String,
+    required: true
+  }
 });
 
 module.exports = mongoose.model("tutor", tutor);

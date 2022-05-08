@@ -87,12 +87,19 @@ tutorRouter.post("/tutorSignUp", upload.single('image'), async (req, res) => {
 
     const imageApiRes = await streamUpload(req);
 
+    const feedbackId = uuidv4();
+    const tutorId = uuidv4();  
+
     const data = new tutorModel({
                 ...req.body,
+                _id:tutorId,
+                feedbackId:feedbackId,
                 imageUrl: imageApiRes.secure_url,
                 password: await generateHash(req.body.password),
               });
           await data.save();
+          const feedback = new feedbackModel({_id: feedbackId, tutorId, responses: [] });
+          await feedback.save();
           res.status(200).json({ message: "Tutor added" });
   } catch (err) {
         console.log(err);
@@ -133,6 +140,7 @@ tutorRouter.get("/course/:_id", async (req, res) => {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
     const tutorData = await tutorModel.find({ _id: tutorId });
     data = tutorData[0].courses.find((course)=>course._id === req.params._id)
+    console.log(data)
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -148,8 +156,8 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
     _id: tutorId,
   });
 
-  const feedbackId = uuidv4();
-  const courseId = uuidv4();  
+  // const feedbackId = uuidv4();
+  // const courseId = uuidv4();  
   const hasCourse = currTutor[0].courses.filter((course) => {
     return course.name === req.body.name;
   });
@@ -175,7 +183,7 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
       };
       const imageApiRes = await streamUpload(req);
 
-      const newCourse = { ...req.body, feedbackId, _id: courseId , imageUrl: imageApiRes.secure_url};
+      const newCourse = { ...req.body, imageUrl: imageApiRes.secure_url};
       tutorModel.findByIdAndUpdate( 
         { _id: tutorId },
         { $push: { courses: newCourse } },
@@ -185,8 +193,8 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
             console.log(err);
             res.status(500).json({ message: err.message });
           } else {
-            const feedback = new feedbackModel({ courseId, _id: feedbackId, tutorId, responses: [] });
-            await feedback.save();
+            // const feedback = new feedbackModel({ courseId, _id: feedbackId, tutorId, responses: [] });
+            // await feedback.save();
             res.json(data);
           }
         }
