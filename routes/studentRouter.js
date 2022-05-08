@@ -7,6 +7,19 @@ const studentRouter = express.Router();
 const { generateHash, compareHash } = require("../utils/hash");
 const { verfiyTokenAndExtractInfo, generateToken } = require("../utils/token");
 
+const cloudinary = require("cloudinary").v2;
+
+const streamifier = require('streamifier')
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+});
+
+const multer  = require('multer')
+const upload = multer();
+
 //user get data
 studentRouter.get("/student/:_id", async (req, res) => {
   try {
@@ -19,7 +32,7 @@ studentRouter.get("/student/:_id", async (req, res) => {
 });
 
 // signup
-studentRouter.post("/studentSignUp", async (req, res) => {
+studentRouter.post("/studentSignUp", upload.single('image'), async (req, res) => {
   const tutor = await tutorModel.find({ email: req.body.email });
 
   const student = await studentModel.find({ email: req.body.email });
@@ -28,8 +41,27 @@ studentRouter.post("/studentSignUp", async (req, res) => {
     return res.status(500).json({ message: "Email already taken" });
   }
 
+  const streamUpload = (req) => {
+    return new Promise((resolve, reject) => {
+        let stream = cloudinary.uploader.upload_stream(
+          (error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          }
+        );
+
+      streamifier.createReadStream(req.file.buffer).pipe(stream);
+    });
+  };
+
+  const imageApiRes = await streamUpload(req);
+
   const data = new studentModel({
     ...req.body,
+    imageUrl: imageApiRes.secure_url,
     password: await generateHash(req.body.password),
   });
 
