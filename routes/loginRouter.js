@@ -53,7 +53,7 @@ loginRouter.post('/login', async (req, res) => {
               maxAge: 18000000,
               httpOnly: true  
             });
-            const responseData = { message: "Success", isTutor };
+            const responseData = { message: "Success", isTutor, _id };
             if (isTutor) {
                 const tutorData = data[0];
                 delete tutorData['password'];
