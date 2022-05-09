@@ -210,23 +210,30 @@ tutorRouter.put("/tutorCourse", upload.single('image'), async (req, res) => {
       _id: tutorId,
     });
     
-    const streamUpload = (req) => {
-      return new Promise((resolve, reject) => {
-          let stream = cloudinary.uploader.upload_stream(
-            (error, result) => {
-              if (result) {
-                resolve(result);
-              } else {
-                reject(error);
+    let imageApiRes = {};
+    if (req.file) {
+      const streamUpload = (req) => {
+        return new Promise((resolve, reject) => {
+            let stream = cloudinary.uploader.upload_stream(
+              (error, result) => {
+                if (result) {
+                  resolve(result);
+                } else {
+                  reject(error);
+                }
               }
-            }
-          );
+            );
+  
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+      imageApiRes = await streamUpload(req);
+    }
+    const newCourse = { ...req.body };
 
-        streamifier.createReadStream(req.file.buffer).pipe(stream);
-      });
-    };
-    const imageApiRes = await streamUpload(req);
-    const newCourse = { ...req.body, imageUrl: imageApiRes.secure_url};
+    if (imageApiRes.secure_url) {
+      newCourse.imageUrl = imageApiRes.secure_url;
+    }
 
    
     tutorModel.findByIdAndUpdate(
