@@ -13,15 +13,15 @@ appointmentRouter.post("/appointment", async (req, res) => {
     const isTutor = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "isTutor");
     checkUser(isTutor, false);
 
-    reqHoursStart = new Date(req.body.timeSlot.start).getHours();
-    reqHourEnd = new Date(req.body.timeSlot.end).getHours();
-    reqMinuteStart = new Date(req.body.timeSlot.start).getMinutes();
-    reqMinuteEnd = new Date(req.body.timeSlot.end).getMinutes();
+    const reqHoursStart = new Date(req.body.timeSlot.start).getHours();
+    const reqHourEnd = new Date(req.body.timeSlot.end).getHours();
+    const reqMinuteStart = new Date(req.body.timeSlot.start).getMinutes();
+    const reqMinuteEnd = new Date(req.body.timeSlot.end).getMinutes();
 
     // within working hours
-    // const { workingHourStart, workingHourEnd } = await tutorModel.find({ tutorId: req.body.tutorId });
-    // workingHourStart = new Date(workingHourStart)
-    // workingHourEnd = new Date(workingHourEnd)
+    const { workingHourStart, workingHourEnd, _id } = await tutorModel.find({ tutorId: req.body.tutorId });
+    workingHourStart = new Date(workingHourStart)
+    workingHourEnd = new Date(workingHourEnd)
     // if () {
     //   res.status(400).json({ message: "Please select time within working Hours" });
     // }
