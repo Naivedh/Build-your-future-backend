@@ -129,6 +129,22 @@ studentRouter.post("/studentCourse", async (req, res) => {
   }
 });
 
+//Enroll
+//checkEnroll
+studentRouter.get("/studentCourse/:_id", async (req, res) => {
+  try {
+    const studentId = verfiyTokenAndExtractInfo(
+      req.cookies["byf-session-config"],
+      "_id"
+    );
+    const student = await studentModel.findById(studentId);
+    const isEnroll = student.enrolledCourses.find((course)=>course.courseId===req.params._id)
+    res.send(isEnroll?true:false);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 //make course favourite => requirement must be enrolled
 //req.body only courseId
 studentRouter.post("/studentFavourite", async (req, res) => {
