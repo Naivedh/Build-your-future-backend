@@ -12,20 +12,13 @@ const time = new mongoose.Schema({
         min:000000000000000,
         max:999999999999999
     },
-    isActive: {
-      default: true,
-      type: Boolean,
-    }
+    status: {
+      default: 'ACTIVE',
+      type: String,
+    },
 });
+
 const appointment = new mongoose.Schema({
-  courseId: {
-    required: true,
-    type: String,
-  },
-  courseName:{
-    required:true,
-    type: String
-  },
   tutorId: {
     required: true,
     type: String,
@@ -33,6 +26,14 @@ const appointment = new mongoose.Schema({
   tutorName:{
     required:true,
     type: String
+  },
+  tutorImageUrl: {
+    required: true,
+    type: String
+  },
+  studentImageUrl: {
+    required: true,
+    type: String,
   },
   studentId: {
     required: true,

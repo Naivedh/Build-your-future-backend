@@ -69,6 +69,12 @@ tutorRouter.post("/tutorSignUp", upload.single('image'), async (req, res) => {
     return res.status(500).json({ message: "Email already taken" });
   }
 
+  const { workingHourStart, workingHourEnd } = req.body;
+
+  if (workingHourStart >= workingHourEnd) {
+    throw { message: 'Please select proper working hours' }
+  }
+  
     const streamUpload = (req) => {
       return new Promise((resolve, reject) => {
           let stream = cloudinary.uploader.upload_stream(

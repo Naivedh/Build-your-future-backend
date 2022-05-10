@@ -1,5 +1,6 @@
 const express = require("express");
 const appointmentModel = require("../models/appointmentModel");
+const studentModel = require("../models/studentModel");
 const tutorModel = require("../models/tutorModel");
 const { checkUser } = require("../utils/checkUser");
 const { verfiyTokenAndExtractInfo } = require("../utils/token");
@@ -10,39 +11,77 @@ const appointmentRouter = express.Router();
 //cannot send everything get coursename student name tutorname
 appointmentRouter.post("/appointment", async (req, res) => {
   try {
-    const isTutor = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "isTutor");
+    const { isTutor, _id: studentId } = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "*");
     checkUser(isTutor, false);
 
-    const reqHoursStart = new Date(req.body.timeSlot.start).getHours();
-    const reqHourEnd = new Date(req.body.timeSlot.end).getHours();
-    const reqMinuteStart = new Date(req.body.timeSlot.start).getMinutes();
-    const reqMinuteEnd = new Date(req.body.timeSlot.end).getMinutes();
+    const { tutorId, timeSlot } = req.body;
+    const reqStartHour = new Date(timeSlot.start).getHours();
+    const reqEndHour = new Date(timeSlot.end).getHours();
+    const reqStartMinute = new Date(timeSlot.start).getMinutes();
+    const reqEndMinute = new Date(timeSlot.end).getMinutes();
 
     // within working hours
-    const { workingHourStart, workingHourEnd, _id } = await tutorModel.find({ tutorId: req.body.tutorId });
-    workingHourStart = new Date(workingHourStart)
-    workingHourEnd = new Date(workingHourEnd)
-    // if () {
-    //   res.status(400).json({ message: "Please select time within working Hours" });
-    // }
+    const tutor = await tutorModel.find({ _id: tutorId });
+    const student = await studentModel.find({ _id: studentId });
 
-    // const tutorAppointmentData = await appointmentModel.find({ tutorId: req.body.tutorId })
+    const { imageUrl: studentImageUrl, name: studentName } = student[0];
+    
+    const { workingHourStart, workingHourEnd, name: tutorName, imageUrl: tutorImageUrl } = tutor[0];
+    
+    const workingHours = {
+      start: new Date(workingHourStart).setDate(new Date().getDate()),
+      end: new Date(workingHourEnd).setDate(new Date().getDate())
+    }
 
-    // tutorAppointmentData.map((specific) => {
-    //   specific.timeSlot.map((oneAppointment) => {
-    //     if (
-          
-    //     ) {
-    //       res.status(400).json({ message: "Please select some other timeslot" });
-    //     }
-    //   })
-    // })
+    workingHours.startHour = new Date(workingHours.start).getHours();
+    workingHours.startMinute = new Date(workingHours.start).getMinutes();
+    workingHours.endHour = new Date(workingHours.end).getHours();
+    workingHours.endMinute = new Date(workingHours.end).getMinutes();
+    
+    if ((timeSlot.end - timeSlot.start) > 3600000) {
+      throw { message: "You cannot book an appointment for more than an hour" };
+    }
+
+    if ((timeSlot.end - timeSlot.start) < 900000) {
+      throw { message: "You need to book an appointment for minimum 15 minutes" };
+    }
+    
+    if (timeSlot.start >= workingHours.start && timeSlot.end <= workingHours.end && (timeSlot.start < timeSlot.end)) {
+      if (reqStartHour === workingHours.startHour && reqStartMinute < workingHours.startMinute) {
+        throw { message: "Please select time within working Hours" };
+      } else if (reqEndHour === workingHours.endHour && reqEndMinute > workingHours.endMinute) {
+        throw { message: "Please select time within working Hours" };
+      }
+    } else {
+      throw { message: "Please select time within working Hours" };
+    }
+
+    const tutorAppointmentData = await appointmentModel.find({ tutorId: req.body.tutorId })
+    
+    tutorAppointmentData.map((pair) => {
+      pair.timeSlot.map((appointment) => {
+        if (appointment.status === 'ACTIVE') {
+          const oldAppointment = {
+            start: new Date(appointment.start).getTime(),
+            end: new Date(appointment.end).getTime(), 
+          }
+
+          if (timeSlot.start === oldAppointment.start || (timeSlot.start > oldAppointment.start && timeSlot.start < oldAppointment.end)) {    // 10:40 - 17:40 
+            throw { message: 'Please select some other slot'};
+          } 
+
+          if (timeSlot.end === oldAppointment.end || (timeSlot.end > oldAppointment.start && timeSlot.end < oldAppointment.end)) {        // 
+            throw { message: 'Please select some other slot'};
+          }
+        }
+      });
+    })
 
 
-    const data = await appointmentModel.find({ courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId })
+    const data = await appointmentModel.find({ tutorId: req.body.tutorId, studentId: req.body.studentId })
 
     if (data.length === 0) {
-      const newData = new appointmentModel(req.body);
+      const newData = new appointmentModel({ ...req.body, tutorId, studentId, studentImageUrl, tutorImageUrl, studentName, tutorName });
       try {
         const dataToSave = await newData.save();
         res.status(200).json(dataToSave);
@@ -52,7 +91,7 @@ appointmentRouter.post("/appointment", async (req, res) => {
     }
     else {
       appointmentModel.findOneAndUpdate(
-        { courseId: req.body.courseId, tutorId: req.body.tutorId, studentId: req.body.studentId },
+        { tutorId: req.body.tutorId, studentId: req.body.studentId },
         { $push: { timeSlot: req.body.timeSlot } },
         { new: true, upsert: true },
         function (err, data) {

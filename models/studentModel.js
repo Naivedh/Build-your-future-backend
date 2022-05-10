@@ -26,6 +26,12 @@ const course = new mongoose.Schema({
   },
 });
 
+// const favouriteTutor = new mongoose.Schema({
+//   tutorId: {
+
+//   },
+  
+// });
 const student = new mongoose.Schema({
   email: {
     required: true,
