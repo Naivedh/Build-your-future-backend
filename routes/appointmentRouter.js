@@ -123,10 +123,10 @@ appointmentRouter.get("/appointment/:_id", async (req, res) => {
 });
 
 //getall for a student
-appointmentRouter.post("/appointments/student", async (req, res) => {
+appointmentRouter.get("/appointments/student/:_id", async (req, res) => {
   try {
     const data = await appointmentModel.find({
-      studentId: req.body.studentId
+      studentId: req.params._id
     });
     res.json(data);
   } catch (error) {
@@ -135,10 +135,10 @@ appointmentRouter.post("/appointments/student", async (req, res) => {
 });
 
 //getall for a tutor
-appointmentRouter.post("/appointments/tutor", async (req, res) => {
+appointmentRouter.get("/appointments/tutor/:_id", async (req, res) => {
   try {
     const data = await appointmentModel.find({
-      tutorId: req.body.tutorId
+      tutorId: req.params._id
     });
     res.json(data);
   } catch (error) {
