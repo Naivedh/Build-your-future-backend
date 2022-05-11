@@ -46,7 +46,11 @@ appointmentRouter.post("/appointment", async (req, res) => {
       throw { message: "You need to book an appointment for minimum 15 minutes" };
     }
     
-    if (timeSlot.start >= workingHours.start && timeSlot.end <= workingHours.end && (timeSlot.start < timeSlot.end)) {
+    if (timeSlot.start < new Date().getTime() || timeSlot.end < new Date().getTime) {
+      throw { message: 'Cannot book an appointment for past time' };
+    }
+
+    if (reqStartHour >= workingHours.startHour && reqEndHour <= workingHours.endHour && (timeSlot.start < timeSlot.end)) {
       if (reqStartHour === workingHours.startHour && reqStartMinute < workingHours.startMinute) {
         throw { message: "Please select time within working Hours" };
       } else if (reqEndHour === workingHours.endHour && reqEndMinute > workingHours.endMinute) {
@@ -56,9 +60,13 @@ appointmentRouter.post("/appointment", async (req, res) => {
       throw { message: "Please select time within working Hours" };
     }
 
-    const tutorAppointmentData = await appointmentModel.find({ tutorId: req.body.tutorId })
+    const tutorAppointmentData = await appointmentModel.find({ tutorId });
     
-    tutorAppointmentData.map((pair) => {
+    const studentAppointmentData = await appointmentModel.find({ studentId, tutorId: { '$ne': tutorId } });
+
+   const mergedAppointmentData = [...tutorAppointmentData, ...studentAppointmentData];
+
+    mergedAppointmentData.map((pair) => {
       pair.timeSlot.map((appointment) => {
         if (appointment.status === 'ACTIVE') {
           const oldAppointment = {
@@ -78,7 +86,7 @@ appointmentRouter.post("/appointment", async (req, res) => {
     })
 
 
-    const data = await appointmentModel.find({ tutorId: req.body.tutorId, studentId: req.body.studentId })
+    const data = await appointmentModel.find({ tutorId, studentId })
 
     if (data.length === 0) {
       const newData = new appointmentModel({ ...req.body, tutorId, studentId, studentImageUrl, tutorImageUrl, studentName, tutorName });
@@ -91,8 +99,8 @@ appointmentRouter.post("/appointment", async (req, res) => {
     }
     else {
       appointmentModel.findOneAndUpdate(
-        { tutorId: req.body.tutorId, studentId: req.body.studentId },
-        { $push: { timeSlot: req.body.timeSlot } },
+        { tutorId, studentId },
+        { $push: { timeSlot: timeSlot } },
         { new: true, upsert: true },
         function (err, data) {
           if (err) {
@@ -118,6 +126,26 @@ appointmentRouter.get("/appointment/:_id", async (req, res) => {
     });
     res.json(data);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+appointmentRouter.get('/appointments', async (req, res) => {
+  try {
+    const { isTutor, _id } = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "*");
+    
+    const identifier = {};
+
+    if (isTutor) {
+      identifier.tutorId = _id;
+    } else {
+      identifier.studentId = _id;
+    }
+
+    const appointments = await appointmentModel.find(identifier);
+    return res.json({ appointments, serverTimestamp: new Date().getTime() });
+  } catch (err) {
     res.status(500).json({ message: error.message });
   }
 });
