@@ -20,18 +20,20 @@ const course = new mongoose.Schema({
     type: Number,
     default:0,
   },
-  isFavourite: {
-    type: Boolean,
-    default: false,
-  },
+  // isFavourite: {
+  //   type: Boolean,
+  //   default: false,
+  // },
 });
 
-// const favouriteTutor = new mongoose.Schema({
-//   tutorId: {
-
-//   },
+const favouriteTutor = new mongoose.Schema({
+  tutorId: {
+    type: String,
+    required: true,
+  },
   
-// });
+});
+
 const student = new mongoose.Schema({
   email: {
     required: true,
@@ -56,7 +58,7 @@ const student = new mongoose.Schema({
   imageUrl: {
     type: String,
   },
-  //course
+  favouriteTutors: [favouriteTutor],
   enrolledCourses: [course],
   hoursStudied: {
     type: Number,

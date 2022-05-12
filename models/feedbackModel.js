@@ -3,19 +3,25 @@ const mongoose = require("mongoose");
 const responses = new mongoose.Schema({
     studentId:{
         type: String,
-        required:true
+        required: true
     },
     studentName:{
         type: String,
-        required:true
+        required: true
     },
     imageUrl:{
         type: String,
-        required:true
+        required: true
     },
     text:{
         type: String,
-        required:true
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1.0,
+        max: 5.0,
     }
 });
 
