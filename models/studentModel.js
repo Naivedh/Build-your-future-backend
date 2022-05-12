@@ -20,10 +20,6 @@ const course = new mongoose.Schema({
     type: Number,
     default:0,
   },
-  // isFavourite: {
-  //   type: Boolean,
-  //   default: false,
-  // },
 });
 
 const favouriteTutor = new mongoose.Schema({
