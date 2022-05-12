@@ -1,5 +1,6 @@
 const express = require("express");
 const appointmentModel = require("../models/appointmentModel");
+const feedbackModel = require("../models/feedbackModel");
 const studentModel = require("../models/studentModel");
 const tutorModel = require("../models/tutorModel");
 const { checkUser } = require("../utils/checkUser");
@@ -115,6 +116,33 @@ appointmentRouter.post("/appointment", async (req, res) => {
   }
   catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+
+appointmentRouter.put("/appointment/:appointmentId", async (req, res) => {
+  try {
+    const { isTutor } = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "*");
+    const { status } = req.body;
+    const { slotId } = req.query;  
+    if (status === 'ACCEPTED') {
+      checkUser(isTutor, true);
+    }
+
+    appointmentModel.findByIdAndUpdate(
+      req.params.appointmentId,
+      { $set: { "timeSlot.$[ele].status": status } },
+      { arrayFilters: [{ "ele._id": slotId }], upsert: true, new: true },
+      function (err, data) {
+        if (err) {
+          res.status(500).json({ message: err.message });
+        } else {
+          res.json(data);
+        }
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
