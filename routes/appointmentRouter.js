@@ -126,13 +126,14 @@ appointmentRouter.put("/appointment/:appointmentId", async (req, res) => {
     const { status } = req.body;
     const { slotId } = req.query;  
     const { appointmentId } = req.params;
+
     if (status === 'ACCEPTED') {
       checkUser(isTutor, true);
     } else if (status === 'CANCELLED') {
-      const [appointment] = await appointmentModel.findById({ _id: appointmentId});
+      const appointment = await appointmentModel.findById({ _id: appointmentId});
       appointment.timeSlot.forEach(t => {
-        if (t._id === slotId) {
-          if ((t.start - new Date().getTime()) > 86400000) {
+        if (t._id == slotId) {
+          if ((t.start - new Date().getTime()) < 86400000) {
             throw { message: 'Cannot cancel an appointment before 24 hours' };
           }
         }
