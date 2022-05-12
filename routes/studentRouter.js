@@ -175,8 +175,8 @@ studentRouter.get("/studentCourse/:_id", async (req, res) => {
   }
 });
 
-//make course favourite => requirement must be enrolled
-//req.body only courseId
+//make course favourite
+//req.body only tutorId
 studentRouter.post("/studentFavourite", async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
@@ -187,24 +187,71 @@ studentRouter.post("/studentFavourite", async (req, res) => {
     const currStudent = await studentModel.find({
       _id: studentId,
     });
-    
-    const course = currStudent[0].enrolledCourses.find((course) => course.courseId == req.body.courseId);
-   
-    course.isFavourite = !course.isFavourite;
 
-    studentModel.findByIdAndUpdate(
-      studentId,
-      { $set: { "enrolledCourses.$[ele]": course } },
-      { arrayFilters: [{ "ele.courseId": req.body.courseId }], upsert: true, new: true },
-      function (err, data) {
-        if (err) {
-          res.status(500).json({ message: err.message });
-        } else {
-          const newData = data.enrolledCourses.filter((course)=>course.isFavourite===true)
-          res.json(newData);
+    const currTutor = await tutorModel.find({
+      _id: req.body.tutorId,
+    });
+  
+    let data = currStudent[0].favouriteTutors.find((data) => data.tutorId == req.body.tutorId);
+
+    if(data){
+      //delete
+      studentModel.updateOne(
+        {_id:studentId},
+        { $pull:{"favouriteTutors":{tutorId:req.body.tutorId}}},
+        { safe: true, upsert: true },
+        function(err,data){
+          if (err) {
+            res.status(500).json({ message: err.message });
+          } else {
+            res.json(data);
+          }
         }
+      );
+    }
+    else{
+      data = {
+        tutorId:currTutor[0]._id,
+        tutorName: currTutor[0].name,
+        tutorImageUrl: currTutor[0].imageUrl
       }
+      studentModel.findByIdAndUpdate(
+        {_id: studentId},
+        { $push: { "favouriteTutors": data } },
+        {upsert: true, new: true },
+        function (err, data) {
+          if (err) {
+            res.status(500).json({ message: err.message });
+          } else {
+            res.json(data);
+          }
+        }
+      );
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// getFavourite by tutorId 
+studentRouter.get("/studentFavourite/:_id", async (req, res) => {
+  try {
+    const studentId = verfiyTokenAndExtractInfo(
+      req.cookies["byf-session-config"],
+      "_id"
     );
+
+    const currStudent = await studentModel.find({
+      _id: studentId,
+    });
+    if(currStudent[0].favouriteTutors){
+      const data = currStudent[0].favouriteTutors.filter((data) => data.tutorId == req.params._id);
+      res.json(data?true:false)
+    }
+    else{
+      res.json(false);
+    }
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
