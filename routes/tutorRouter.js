@@ -114,20 +114,60 @@ tutorRouter.post("/tutorSignUp", upload.single('image'), async (req, res) => {
 });
 
 //update Tutor profile
-tutorRouter.put("/tutor", async (req, res) => {
+tutorRouter.put("/tutor", upload.single('image'), async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "_id");
+
+    const currTutor = await tutorModel.find({
+      _id: tutorId,
+    });
+
     const tutor = { ...req.body, _id: tutorId }
+
+    let imageApiRes = {};
+    if (req.file) {
+      const streamUpload = (req) => {
+        return new Promise((resolve, reject) => {
+            let stream = cloudinary.uploader.upload_stream(
+              (error, result) => {
+                if (result) {
+                  resolve(result);
+                } else {
+                  reject(error);
+                }
+              }
+            );
+  
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+      imageApiRes = await streamUpload(req);
+    }
+
+
+    if (imageApiRes.secure_url) {
+      tutor.imageUrl = imageApiRes.secure_url;
+    }
+
     if (tutor.password) {
       tutor.password = await generateHash(req.body.password);
+    }else{
+      tutor.password = currTutor.password;
     }
+    // if(tutor.workingHourStart === NAN){
+    //   tutor.workingHourStart = currTutor.workingHourStart;
+    // }
+    // if(tutor.workingHourEnd===NAN){
+    //   tutor.workingHourEnd =currTutor.workingHourEnd;
+    // }
+
     tutorModel.findByIdAndUpdate(
       tutorId,
       { $set: tutor },
       { new: true },
       function (err, data) {
         if (err) {
-          res.status(500).json({ message: error.message });
+          res.status(500).json({ message: err.message });
         } else {
           res.json(data);
         }
@@ -213,9 +253,6 @@ tutorRouter.post("/tutorCourse", upload.single('image'), async (req, res) => {
 tutorRouter.put("/tutorCourse", upload.single('image'), async (req, res) => {
   try {
     const tutorId = verfiyTokenAndExtractInfo(req.cookies['byf-session-config']);
-    const currTutor = await tutorModel.find({
-      _id: tutorId,
-    });
     
     let imageApiRes = {};
     if (req.file) {

@@ -75,17 +75,47 @@ studentRouter.post("/studentSignUp", upload.single('image'), async (req, res) =>
 
 
 //update student
-studentRouter.put("/student", async (req, res) => {
+studentRouter.put("/student", upload.single('image'), async (req, res) => {
   try {
     const studentId = verfiyTokenAndExtractInfo(
       req.cookies["byf-session-config"],
       "_id"
     );
-    const student = { ...req.body, _id: studentId };
-    
-    if (student.password) {
-      student.password = await req.body.password;
+    const currStudent = await studentModel.find({
+      _id: studentId,
+    });
+
+    let imageApiRes = {};
+    if (req.file) {
+      const streamUpload = (req) => {
+        return new Promise((resolve, reject) => {
+            let stream = cloudinary.uploader.upload_stream(
+              (error, result) => {
+                if (result) {
+                  resolve(result);
+                } else {
+                  reject(error);
+                }
+              }
+            );
+  
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+      imageApiRes = await streamUpload(req);
     }
+
+    const student = { ...req.body, _id: studentId };
+    if (imageApiRes.secure_url) {
+      student.imageUrl = imageApiRes.secure_url;
+    }
+
+    if (student.password) {
+      student.password = await generateHash(req.body.password);
+    }else{
+      student.password = currStudent.password;
+    }
+
     studentModel.findByIdAndUpdate(
       studentId,
       { $set: student },
