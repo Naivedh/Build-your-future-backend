@@ -46,10 +46,10 @@ appointmentRouter.post("/appointment", async (req, res) => {
       throw { message: "You need to book an appointment for minimum 15 minutes" };
     }
     
-    if (timeSlot.start < new Date().getTime() || timeSlot.end < new Date().getTime) {
+    if (timeSlot.start < new Date().getTime() || timeSlot.end < new Date().getTime()) {
       throw { message: 'Cannot book an appointment for past time' };
     }
-
+    
     if (reqStartHour >= workingHours.startHour && reqEndHour <= workingHours.endHour && (timeSlot.start < timeSlot.end)) {
       if (reqStartHour === workingHours.startHour && reqStartMinute < workingHours.startMinute) {
         throw { message: "Please select time within working Hours" };

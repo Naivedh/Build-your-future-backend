@@ -31,7 +31,14 @@ const favouriteTutor = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
+  tutorName: {
+    type: String,
+    required: true,
+  },
+  tutorImageUrl: {
+    type: String,
+    required: true,
+  },
 });
 
 const student = new mongoose.Schema({
