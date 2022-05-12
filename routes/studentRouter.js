@@ -257,6 +257,7 @@ studentRouter.get("/studentFavourite/:_id", async (req, res) => {
   }
 });
 
+
 //getfovourite
 studentRouter.get("/studentFavourite", async (req, res) => {
   try {
@@ -264,14 +265,11 @@ studentRouter.get("/studentFavourite", async (req, res) => {
       req.cookies["byf-session-config"],
       "_id"
     );
-
     const currStudent = await studentModel.find({
       _id: studentId,
     });
-   
-    const favouriteCourses = currStudent[0].enrolledCourses.filter((course) => course.isFavourite == true);
 
-    res.json(favouriteCourses);
+    res.json(currStudent[0].favouriteTutors);
 
   } catch (error) {
     res.status(500).json({ message: error.message });
