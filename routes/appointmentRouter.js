@@ -125,12 +125,22 @@ appointmentRouter.put("/appointment/:appointmentId", async (req, res) => {
     const { isTutor } = verfiyTokenAndExtractInfo(req.cookies["byf-session-config"], "*");
     const { status } = req.body;
     const { slotId } = req.query;  
+    const { appointmentId } = req.params;
     if (status === 'ACCEPTED') {
       checkUser(isTutor, true);
+    } else if (status === 'CANCELLED') {
+      const [appointment] = await appointmentModel.findById({ _id: appointmentId});
+      appointment.timeSlot.forEach(t => {
+        if (t._id === slotId) {
+          if ((t.start - new Date().getTime()) > 86400000) {
+            throw { message: 'Cannot cancel an appointment before 24 hours' };
+          }
+        }
+      })
     }
 
     appointmentModel.findByIdAndUpdate(
-      req.params.appointmentId,
+      appointmentId,
       { $set: { "timeSlot.$[ele].status": status } },
       { arrayFilters: [{ "ele._id": slotId }], upsert: true, new: true },
       function (err, data) {
